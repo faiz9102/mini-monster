@@ -4,8 +4,9 @@ declare(strict_types=1);
 namespace Framework\Response\Result;
 
 use Framework\Response\AbstractResponse;
-use framework\View\Layout\LayoutInterface;
-use framework\View\Layout\LayoutProcessorInterface;
+use Framework\View\Layout\Layout;
+use Framework\View\Layout\LayoutInterface;
+use Framework\View\Layout\LayoutProcessorInterface;
 
 class Page extends AbstractResponse
 {
@@ -14,18 +15,13 @@ class Page extends AbstractResponse
     private LayoutProcessorInterface $layoutProcessor;
 
     public function __construct(
-        LayoutInterface $layout, // Use interface consistently
+        Layout $layout,
         string $htmlContent = '',
         int    $statusCode = 200,
                         $headers = [],
     ) {
         $this->layout = $layout;
         parent::__construct($htmlContent, $statusCode, $headers, self::CONTENT_TYPE);
-    }
-
-    public function getLayout(): LayoutInterface
-    {
-        return $this->layout;
     }
 
     /**
@@ -55,9 +51,10 @@ class Page extends AbstractResponse
             header("$name: $value");
         }
 
-        $htmloutput = $this->layout->render();
+//        $htmloutput = $this->layout->render();
 //        $this->setBody($htmloutput);
 
+        $htmloutput = "<h1>Hi From Faiz</h1>";
         $this->body? : $this->setBody($htmloutput);
         // Output the body content
         echo $this->getBody();

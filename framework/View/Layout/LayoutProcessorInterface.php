@@ -19,13 +19,4 @@ interface LayoutProcessorInterface
      * @return string
      */
     public function process(): string;
-
-    /**
-     * Get the layout configuration.
-     *
-     * @param string $layoutFile The path to the layout file.
-     * @param bool $isAdminLayout Whether the layout is for admin area.
-     * @return array The layout configuration as an associative array.
-     */
-    public function getLayoutConfig(string $layoutFile, bool $isAdminLayout = false): array;
 }

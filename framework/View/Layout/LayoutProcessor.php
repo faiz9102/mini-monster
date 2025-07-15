@@ -8,7 +8,7 @@ use Framework\View\Block\Template\Helper as LayoutHelper;
 class LayoutProcessor implements LayoutProcessorInterface
 {
     /**
-     * @var \framework\View\Layout\LayoutHelper
+     * @var \Framework\View\Layout\LayoutHelper
      */
     protected LayoutHelper $helper;
     /**
@@ -18,9 +18,8 @@ class LayoutProcessor implements LayoutProcessorInterface
 
     protected Layout $layout;
 
-    public function __construct(Layout $layout, LayoutHelper $helper, LayoutParser $parser)
+    public function __construct(LayoutHelper $helper, LayoutParser $parser)
     {
-        $this->layout = $layout;
         $this->helper = $helper;
         $this->parser = $parser;
     }
@@ -33,7 +32,7 @@ class LayoutProcessor implements LayoutProcessorInterface
     public function process(): string
     {
         // Get the layout identifier
-        $layoutIdentifier = $layout->getIdentifier();
+        $layoutIdentifier = "";
 
         // Resolve the layout file path based on the identifier
         $layoutFile = $this->resolveLayoutFilePath($layoutIdentifier);
@@ -42,16 +41,9 @@ class LayoutProcessor implements LayoutProcessorInterface
         $layoutConfig = $this->getLayoutConfig($layoutFile);
 
         // Set the blocks in the layout
-        $layout->setBlocks(...$layoutConfig['blocks']);
 
         // Render the layout to HTML
-        return $layout->render();
-    }
-
-    protected function getLayoutConfig(string $layoutFile, $isAdminLayout = false): array
-    {
-        $config = $this->parser->parse($layoutFile);
-        return $config;
+        return "";
     }
 
     /**
@@ -81,7 +73,7 @@ class LayoutProcessor implements LayoutProcessorInterface
     /**
      * Get the helper instance.
      *
-     * @return \framework\View\Layout\LayoutHelper
+     * @return \Framework\View\Layout\LayoutHelper
      */
     public function getHelper(): LayoutHelper
     {

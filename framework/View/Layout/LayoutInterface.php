@@ -1,6 +1,8 @@
 <?php
 
-namespace framework\View\Layout;
+namespace Framework\View\Layout;
+
+use Framework\View\Block\Template\Element as Block;
 
 interface LayoutInterface
 {
@@ -40,22 +42,6 @@ interface LayoutInterface
      * @return Block[]
      */
     public function getBlocks(): array;
-
-    /**
-     * Set blocks in the layout.
-     *
-     * @param Block ...$Blocks
-     * @return self
-     */
-    public function setBlocks(Block ...$Blocks): self;
-
-    /**
-     * Add a block to the layout.
-     *
-     * @param Block $block
-     * @return self
-     */
-    public function addBlock(Block $block): self;
 
     /**
      * Get the path to the template file for this layout.

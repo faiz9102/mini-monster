@@ -5,8 +5,8 @@ namespace App\Services;
 use Framework\DI\ServiceProvider;
 use Framework\Response\Result\Page;
 use Framework\View\Block\Template\Helper as LayoutHelper;
-use framework\View\Layout\Layout;
-use framework\View\Layout\LayoutInterface;
+use Framework\View\Layout\Layout;
+use Framework\View\Layout\LayoutInterface;
 use Framework\View\Layout\LayoutParser;
 use Framework\View\Layout\LayoutProcessor;
 
@@ -32,9 +32,9 @@ class ViewServiceProvider extends ServiceProvider
             );
         });
 
-        // Register Layout
+        // Register Layout - fixed to avoid circular dependency
         $this->container->singleton(LayoutInterface::class, function () {
-            return new Layout($this->container->resolve(Layout::class));
+            return new Layout();
         });
 
         // Bind interface to concrete implementation
