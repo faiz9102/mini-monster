@@ -1,0 +1,20 @@
+{
+    "name": "faiz/lms-portal",
+    "description": "A basic LMS portal for managing students and instructors",
+    "type": "project",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "App\\": "app/code/",
+            "Framework\\": "framework/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Muhammad Faiz"
+        }
+    ],
+    "require": {
+        "monolog/monolog": "^3.9"
+    }
+}

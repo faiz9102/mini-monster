@@ -1,0 +1,57 @@
+{
+  "layout": {
+    "version": "1.0.0",
+    "components": [
+      {
+        "name": "index.index",
+        "type": "block",
+        "class": "Framework\\View\\Block\\Template\\Element",
+        "template": "adminhtml::index/index.phtml",
+        "arguments": {
+          "data": {
+            "area": "adminhtml"
+          }
+        },
+        "children": []
+      },
+      {
+        "name": "index.index.sidebar",
+        "type": "block",
+        "class": "Framework\\View\\Block\\Template\\Element",
+        "template": "adminhtml::index/sidebar.phtml",
+        "arguments": {
+          "data": {
+            "area": "adminhtml"
+          },
+          "clildren": {
+            "menu": {
+              "name": "index.index.sidebar.menu",
+              "type": "block",
+              "class": "Framework\\View\\Block\\Template\\Element",
+              "template": "adminhtml::index/sidebar/menu.phtml",
+              "arguments": {
+                "data": {
+                  "area": "adminhtml"
+                }
+              }
+            }
+          }
+        },
+        "children": [
+          {
+            "name": "index.index.sidebar.menu",
+            "type": "block",
+            "class": "Framework\\View\\Block\\Template\\Element",
+            "template": "adminhtml::index/sidebar/menu.phtml",
+            "arguments": {
+              "data": {
+                "area": "adminhtml"
+              }
+            },
+            "clildren": []
+          }
+        ]
+      }
+    ]
+  }
+}
