@@ -1,20 +1,22 @@
 <?php
+
 namespace App;
 
 use Framework\DI\Container;
-use App\ConfigProvider;
 use Psr\Log\LoggerInterface;
 
 class Application
 {
+    private static ?Application $instance = null;
     private Container $container;
 
     private ConfigProvider $config;
 
-    private ?LoggerInterface $logger = null;
+    private LoggerInterface $logger;
 
-    public function __construct(Container $container)
+    private function __construct(Container $container, LoggerInterface $logger)
     {
+        $this->logger = $logger;
         $this->container = $container;
         $this->config = ConfigProvider::getInstance();
     }
@@ -87,5 +89,16 @@ class Application
             }
             throw $e; // Re-throw to let the global handler catch it
         }
+    }
+
+    public static function getInstance(
+        Container       $container,
+        LoggerInterface $logger
+    ): Application
+    {
+        if (self::$instance === null) {
+            self::$instance = new self($container, $logger);
+        }
+        return self::$instance;
     }
 }

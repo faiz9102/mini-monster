@@ -42,11 +42,4 @@ interface LayoutInterface
      * @return Block[]
      */
     public function getBlocks(): array;
-
-    /**
-     * Get the path to the template file for this layout.
-     *
-     * @return string
-     */
-    public function getTemplatePath(): string;
 }

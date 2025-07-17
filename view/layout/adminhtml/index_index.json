@@ -1,6 +1,10 @@
 {
   "layout": {
     "version": "1.0.0",
+    "id": "adminhtml:index_index",
+    "title": "Admin Homepage",
+    "description": "Layout for the admin homepage",
+    "page": "deafault_login_form",
     "components": [
       {
         "name": "index.index",
@@ -23,7 +27,7 @@
           "data": {
             "area": "adminhtml"
           },
-          "clildren": {
+          "children": {
             "menu": {
               "name": "index.index.sidebar.menu",
               "type": "block",
@@ -48,7 +52,7 @@
                 "area": "adminhtml"
               }
             },
-            "clildren": []
+            "children": []
           }
         ]
       }

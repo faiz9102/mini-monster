@@ -8,7 +8,7 @@ return [
     'directories' => [
         'root' => __DIR__ . '/../../',
         'static' => 'static',
-        'view' => 'view' ,
+        'view' => __DIR__ . '/../../view' ,
         'media' => 'media',
         'document_root_is_pub' => true
     ],

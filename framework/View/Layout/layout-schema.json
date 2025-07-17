@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/schemas/layout.schema.json",
+  "title": "Layout Configuration",
+  "type": "object",
+  "required": ["layout"],
+  "properties": {
+    "layout": {
+      "type": "object",
+      "required": ["version", "id", "title", "description", "page", "components"],
+      "properties": {
+        "version": { "type": "string" },
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "page": { "type": "string" },
+        "components": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/block" }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "block": {
+      "type": "object",
+      "required": ["name", "type", "class", "template"],
+      "properties": {
+        "name": { "type": "string" },
+        "type": { "type": "string", "const": "block" },
+        "class": { "type": "string" },
+        "template": { "type": "string" },
+        "arguments": {
+          "type": "object",
+          "properties": {
+            "data": {
+              "type": "object",
+              "properties": {
+                "area": { "type": "string" }
+              },
+              "required": ["area"],
+              "additionalProperties": true
+            },
+            "children": {
+              "type": "object",
+              "additionalProperties": { "$ref": "#/$defs/block" }
+            }
+          },
+          "additionalProperties": true
+        },
+        "children": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/block" }
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

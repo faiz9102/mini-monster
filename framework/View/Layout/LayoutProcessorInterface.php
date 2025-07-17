@@ -1,6 +1,6 @@
 <?php
 
-namespace framework\View\Layout;
+namespace Framework\View\Layout;
 
 interface LayoutProcessorInterface
 {
@@ -11,12 +11,7 @@ interface LayoutProcessorInterface
      * @param bool $isAdminLayout Whether the layout is for admin area.
      * @return string The rendered HTML of the layout.
      */
-    public function renderLayout(string $layoutFile, bool $isAdminLayout = false): string;
+    public function render(Layout $layout): string;
 
-    /**
-     * Process the layout and return the rendered HTML.
-     *
-     * @return string
-     */
-    public function process(): string;
+    public function getLayoutFile(string $layoutIdentifier): string;
 }

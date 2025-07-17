@@ -29,4 +29,14 @@ abstract class AbstractAction implements BaseActionInterface
         $env = require_once "../../app/config/env.php";
         return $env['base_url'] ?? '';
     }
+
+    public function isAdminRequest(): bool
+    {
+        return false;
+    }
+
+    public function getRequestOrigin(): string
+    {
+        return self::REQUEST_ORIGIN;
+    }
 }

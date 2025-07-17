@@ -12,7 +12,7 @@ class LayoutParser
      * @param string $layoutFile The path to the layout file.
      * @return array The layout config array.
      */
-    public function parse(string $layoutFile): string
+    public function parse(string $layoutFile): array
     {
         if (!file_exists($layoutFile)) {
             throw new \InvalidArgumentException("Layout file does not exist: $layoutFile");

@@ -1,27 +1,44 @@
 <?php
 
-namespace framework\View\Layout;
+namespace Framework\View\Layout;
 
 use App\ConfigProvider;
 use Framework\View\Block\Template\Helper as LayoutHelper;
+use Framework\FileSystem\ViewFileSystem;
+use Opis\JsonSchema\Validator;
 
 class LayoutProcessor implements LayoutProcessorInterface
 {
-    /**
-     * @var \Framework\View\Layout\LayoutHelper
-     */
-    protected LayoutHelper $helper;
     /**
      * @var LayoutParser
      */
     protected LayoutParser $parser;
 
-    protected Layout $layout;
+    /**
+     * @var ViewFileSystem
+     */
+    protected ViewFileSystem $viewFileSystem;
 
-    public function __construct(LayoutHelper $helper, LayoutParser $parser)
-    {
-        $this->helper = $helper;
+    /**
+     * @var Validator
+     */
+    protected Validator $validator;
+
+    /**
+     * @var LayoutHelper
+     */
+    protected LayoutHelper $helper;
+
+    public function __construct(
+        LayoutParser $parser,
+        ViewFileSystem $viewFileSystem,
+        Validator $validator,
+        LayoutHelper $helper
+    ) {
         $this->parser = $parser;
+        $this->viewFileSystem = $viewFileSystem;
+        $this->validator = $validator;
+        $this->helper = $helper;
     }
 
     /**
@@ -78,5 +95,70 @@ class LayoutProcessor implements LayoutProcessorInterface
     public function getHelper(): LayoutHelper
     {
         return $this->helper;
+    }
+
+    public function render(LayoutInterface $layout): string
+    {
+        // Get the layout file based on the layout identifier
+        $layoutFile = $this->getLayoutFile($layout->getName());
+
+        // Check if the layout file exists
+        if (file_exists($layoutFile)) {
+            $layoutConfig = $this->parser->parse($layoutFile);
+        }
+        return '';
+    }
+
+    /**
+     * Get the layout file based on the layout identifier.
+     * layout identifier is in the format 'area:controllerName_ActionName'. (default)
+     * area can be 'adminhtml', 'frontend' or empty for default area.
+     * which should resolve to 'view/layout/area/controllername_actioname.json'.
+     *
+     * @param string $layoutIdentifier
+     * @return string
+     */
+    public function getLayoutFile(string $layoutIdentifier): string
+    {
+        $layoutInfo = self::getLayoutInfo($layoutIdentifier);
+        $viewPath = ViewFileSystem::getViewPath(); // Returns Path with trainling slash
+
+        $layoutFilePath = $viewPath . 'layout' . DIRECTORY_SEPARATOR
+            . $layoutInfo['area'] . DIRECTORY_SEPARATOR
+            . $layoutInfo['filePath'] . '.json';
+
+        return $layoutFilePath;
+    }
+
+    public static function getLayoutInfo(string $layoutIdentifier): array
+    {
+        $parts = explode(PATH_SEPARATOR, $layoutIdentifier);
+        $partsCount = count($parts);
+
+        if ($partsCount < 1 || $partsCount > 2) {
+            throw new \InvalidArgumentException("Layout identifier must be in the format 'area:controllerName_actionName'.");
+        }
+
+        if ($partsCount === 2) {
+            $area = strtolower($parts[0]) ?: 'base';
+            $identifier = $parts[1];
+        } else {
+            $area = 'base';
+            $identifier = $parts[0];
+        }
+
+        $fileNameParts = explode('_', $identifier);
+        $filePathComponents = array_map(function ($component) {
+            return strtolower(trim($component));
+        }, $fileNameParts);
+        $filePath = implode("_", $filePathComponents);
+
+        return [
+            'area' => $area,
+            'filePath' => $filePath,
+            'parts' => $parts,
+            'partsCount' => $partsCount,
+            'filePathComponents' => $filePathComponents,
+        ];
     }
 }

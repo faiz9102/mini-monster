@@ -42,8 +42,10 @@ class ConfigProvider
         throw new \InvalidArgumentException("Key '$key' already exists in the configuration.");
     }
 
+
+    // TODO: remove this getViewDir method in the future and  use it's implementation from FileSystem class
     public static function getViewDir(): string
     {
-        return self::getInstance()->get('view', __DIR__ . '/../../view');
+        return self::getInstance()->get('view', 'view');
     }
 }

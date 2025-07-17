@@ -11,9 +11,9 @@ use Framework\View\Block\Template\Element as Block;
 class Layout implements LayoutInterface
 {
     /**
-     * @var Block[] $Blocks
+     * @var Block[] $_Blocks
      */
-    private array $Blocks = [];
+    private array $_Blocks = [];
     private string $_name;
     private string $_template;
 
@@ -40,13 +40,7 @@ class Layout implements LayoutInterface
 
     public function getBlocks(): array
     {
-        return $this->Blocks;
-    }
-
-    public function getTemplatePath(): string
-    {
-        // TODO : implement layout file mapping logic
-        return '';
+        return $this->_Blocks;
     }
 
     /**
@@ -69,7 +63,7 @@ class Layout implements LayoutInterface
 
         // If no template or template doesn't exist, render blocks directly
         if (empty($output)) {
-            foreach ($this->Blocks as $block) {
+            foreach ($this->_Blocks as $block) {
                 $output .= $block->toHtml();
             }
         }

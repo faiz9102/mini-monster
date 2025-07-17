@@ -43,7 +43,19 @@ abstract class AbstractAction implements BaseActionInterface
      */
     public function getBaseUrl(): string
     {
-        $env = require_once "../../app/config/env.php";
+        $env = require_once "../../app.php/config/env.php";
         return $env['base_url'] ?? '';
+    }
+
+    public function isAdminRequest(): bool
+    {
+        // This method can be used to determine if the request is an admin request
+        // For now, we will return true as a placeholder
+        return true;
+    }
+
+    public function getRequestOrigin(): string
+    {
+        return self::REQUEST_ORIGIN;
     }
 }

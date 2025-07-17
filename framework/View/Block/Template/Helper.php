@@ -55,7 +55,7 @@ class Helper
      * Template Path Resolver
      *
      * This method can be used to resolve the path of a template file based on a given identifier.
-     * For example, it can be used to convert a template identifier like 'admin/index/index' into a file path like 'app/view/admin/index/index.phtml'.
+     * For example, it can be used to convert a template identifier like 'admin/index/index' into a file path like 'app.php/view/admin/index/index.phtml'.
      * @param string $identifier The template identifier.
      * @return string The resolved file path.
      */
@@ -63,7 +63,7 @@ class Helper
     {
         $viewDirectory = ConfigProvider::getInstance()->get('directories')['view'];
 
-        // Assuming templates are stored in 'app/view/' directory
+        // Assuming templates are stored in 'app.php/view/' directory
         $baseDir = __DIR__ . '/../../../../../view/';
         $path = str_replace('/', DIRECTORY_SEPARATOR, $identifier);
         return $viewDirectory . 'layout/adminhtml/' . $identifier . '.html';
