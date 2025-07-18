@@ -114,4 +114,9 @@ abstract class AbstractResponse implements ResponseInterface
         // Output the body content
         echo $this->getBody();
     }
+
+    public function clearHeaders(): void
+    {
+        header_remove();
+    }
 }

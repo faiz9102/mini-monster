@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://example.com/schemas/layout.schema.json",
+  "$id": "schema:///layout",
   "title": "Layout Configuration",
   "type": "object",
   "required": ["layout"],

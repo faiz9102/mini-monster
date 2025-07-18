@@ -6,9 +6,9 @@ return [
         'frontName' => 'admin785'
     ],
     'directories' => [
-        'root' => __DIR__ . '/../../',
+        'root' => __DIR__ . '/../..',
         'static' => 'static',
-        'view' => __DIR__ . '/../../view' ,
+        'view' => 'view' ,
         'media' => 'media',
         'document_root_is_pub' => true
     ],

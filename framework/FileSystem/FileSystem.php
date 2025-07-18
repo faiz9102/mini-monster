@@ -21,7 +21,7 @@ class FileSystem implements FileSystemInterface
     public static function getRootPath(): string
     {
         $rootPath = ConfigProvider::getInstance()->get("directories")['root'];
-        return realpath($rootPath);
+        return realpath(rtrim($rootPath, DIRECTORY_SEPARATOR));
     }
 
     public static function getFrameworkPath(): string

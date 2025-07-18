@@ -3,27 +3,32 @@ declare(strict_types=1);
 
 namespace Framework\Response\Result;
 
+use Framework\FileSystem\ViewFileSystem;
 use Framework\Response\AbstractResponse;
+use Framework\Schema\SchemaFacade;
 use Framework\View\Layout\Layout;
 use Framework\View\Layout\LayoutInterface;
 use Framework\View\Layout\LayoutProcessorInterface;
-use Framework\Schema\SchemaFacade;
-use Opis\JsonSchema\Uri;
 
 class Page extends AbstractResponse
 {
+    const string SCHEMA_ID = 'layout';
     public const string CONTENT_TYPE = 'text/html';
     private LayoutInterface $layout;
     private LayoutProcessorInterface $layoutProcessor;
 
+    private SchemaFacade $schemaFacade;
+
     public function __construct(
-        Layout $layout,
-//        LayoutProcessorInterface $layoutProcessor,
-        string $htmlContent = '',
-        int    $statusCode = 200,
-                        $headers = [],
-    ) {
-//        $this->layoutProcessor = $layoutProcessor;
+        Layout                   $layout,
+        LayoutProcessorInterface $layoutProcessor,
+        SchemaFacade             $schemaFacade,
+        string                   $htmlContent = '',
+        int                      $statusCode = 200,
+        array                    $headers = [],
+    )   {
+        $this->layoutProcessor = $layoutProcessor;
+        $this->schemaFacade = $schemaFacade;
         $this->layout = $layout;
         $this->contentType = self::CONTENT_TYPE;
         parent::__construct($htmlContent, $statusCode, $headers, self::CONTENT_TYPE);
@@ -40,36 +45,26 @@ class Page extends AbstractResponse
 
     public function send(): void
     {
-        $facade = SchemaFacade::getInstance();
-        $loader = $facade->getLoader();
-        $loader->loadFrameworkSchema();
-        $helper = $facade->getHelper();
-        $schemas = $helper->diccoverSchemaFromFrameworkDir();
-        $uri = null;
+        $this->layout->setName("adminhtml:index_index");
+        $file = $this->layoutProcessor->getLayoutFile($this->layout);
 
-        foreach ($schemas as $schema => $file) {
-            $SchemaUri = [
-                'scheme' => '',
-                "id" => $schema . "#",
-                'user' => null,
-                'pass' => null,
-                'host' => null,
-                'port' => null,
-                'path' => $file,
-                'query' => null,
-                'fragment' => null,
-            ];
-            $uri = new Uri($SchemaUri);
+        // Load and register framework schemas BEFORE validation
+        $this->schemaFacade->loadFrameworkSchema();
 
-            $loader->resolver()->registerFile("layout", $file);
+        // Validate the layout file against the schema
+        try {
+            $isSchemaValid = $this->schemaFacade->validate(
+                $file, self::SCHEMA_ID
+            );
+
+            if (!$isSchemaValid) {
+            }
+        } catch (\Exception $e) {
+            // Continue execution even if validation fails in development
         }
-        $file = $loader->resolver()->resolve($uri);
 
 
-
-
-
-        // Set the HTTP response code
+        // Set the HTTP response code()
         http_response_code($this->responseCode);
 
         // Set the content type header
@@ -84,15 +79,15 @@ class Page extends AbstractResponse
 
         // Process the layout and get the HTML output
         $htmloutput = $this->layoutProcessor->render($this->layout->setName("adminhtml:index_index"));
-        $this->body? : $this->setBody($htmloutput);
+        $this->body ?: $this->setBody($htmloutput);
 
 
         // Output the body content
 //        echo $this->getBody();
-        echo $this->layoutProcessor->getLayoutFile($this->layout->getName());
+        echo $this->layoutProcessor->getLayoutFile($this->layout);
     }
 
-    private function getPageLayoutCofig()
+    private function getPageLayoutConfig()
     {
 
     }

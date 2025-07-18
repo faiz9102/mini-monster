@@ -2,19 +2,20 @@
 
 namespace App;
 
+use Framework\App\AppInterface;
+use Framework\App\Bootstrap;
 use Framework\DI\Container;
+use Framework\Response\ResponseInterface;
+use Framework\Response\Result\Page;
 use Psr\Log\LoggerInterface;
 
-class Application
+class Application implements AppInterface
 {
-    private static ?Application $instance = null;
     private Container $container;
-
     private ConfigProvider $config;
-
     private LoggerInterface $logger;
 
-    private function __construct(Container $container, LoggerInterface $logger)
+    public function __construct(Container $container, LoggerInterface $logger)
     {
         $this->logger = $logger;
         $this->container = $container;
@@ -30,75 +31,81 @@ class Application
         return $this;
     }
 
-    public function run()
+    /**
+     * Launch application
+     *
+     * @return ResponseInterface
+     */
+    public function launch(): ResponseInterface
     {
-        try {
-            $path = trim(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/');
-            $parts = array_values(array_filter(explode('/', $path)));
+        $path = trim(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/');
+        $parts = array_values(array_filter(explode('/', $path)));
 
-            $backend = $this->config->get('backend', []);
-            $frontName = is_array($backend) ? ($backend['frontName'] ?? '') : '';
-            if (isset($parts[0]) && $parts[0] === $frontName) {
-                array_shift($parts);
-                $isAdminUrl = true;
-            }
+        $backend = $this->config->get('backend', []);
+        $frontName = is_array($backend) ? ($backend['frontName'] ?? '') : '';
+        if (isset($parts[0]) && $parts[0] === $frontName) {
+            array_shift($parts);
+            $isAdminUrl = true;
+        }
 
-            $controllerName = $parts[0] ?? 'index';
-            $actionName = $parts[1] ?? 'index';
+        $controllerName = $parts[0] ?? 'index';
+        $actionName = $parts[1] ?? 'index';
 
-            $controllerClass = 'App\\Controllers\\' .
-                (isset($isAdminUrl) && $isAdminUrl ? 'Adminhtml\\' : '') .
-                ucfirst($controllerName) . '\\' . ucfirst($actionName);
-            $actionMethod = 'execute';
+        $controllerClass = 'App\\Controllers\\' .
+            (isset($isAdminUrl) && $isAdminUrl ? 'Adminhtml\\' : '') .
+            ucfirst($controllerName) . '\\' . ucfirst($actionName);
+        $actionMethod = 'execute';
 
-            // Log route information if logger is available
+        // Log route information if logger is available
+        if ($this->logger) {
+            $this->logger->info('Route dispatched', [
+                'controller' => $controllerClass,
+                'action' => $actionMethod,
+                'path' => $path,
+                'isAdmin' => isset($isAdminUrl) && $isAdminUrl
+            ]);
+        }
+
+        if (class_exists($controllerClass) && method_exists($controllerClass, $actionMethod)) {
+            // Let the container create the controller with all dependencies
+            $controller = $this->container->get($controllerClass);
+            return $controller->$actionMethod();
+        } else {
             if ($this->logger) {
-                $this->logger->info('Route dispatched', [
+                $this->logger->warning("Route not found", [
                     'controller' => $controllerClass,
-                    'action' => $actionMethod,
-                    'path' => $path,
-                    'isAdmin' => isset($isAdminUrl) && $isAdminUrl
+                    'action' => $actionMethod
                 ]);
             }
-
-            if (class_exists($controllerClass) && method_exists($controllerClass, $actionMethod)) {
-                // Let the container create the controller with all dependencies
-                $controller = $this->container->resolve($controllerClass);
-                $response = $controller->$actionMethod();
-
-                $response->send();
-            } else {
-                http_response_code(404);
-                if ($this->logger) {
-                    $this->logger->warning("Route not found", [
-                        'controller' => $controllerClass,
-                        'action' => $actionMethod
-                    ]);
-                }
-                echo "$controllerClass | $controllerName - $actionName not found.";
-            }
-        } catch (\Exception $e) {
-            // Log exceptions if logger is available
-            if ($this->logger) {
-                $this->logger->error('Application error', [
-                    'exception' => get_class($e),
-                    'message' => $e->getMessage(),
-                    'file' => $e->getFile(),
-                    'line' => $e->getLine()
-                ]);
-            }
-            throw $e; // Re-throw to let the global handler catch it
+            
+            // Return a 404 response
+            $response = $this->container->get(Page::class);
+            $response->setStatusCode(404);
+            $response->setBody("$controllerClass | $controllerName - $actionName not found.");
+            return $response;
         }
     }
 
-    public static function getInstance(
-        Container       $container,
-        LoggerInterface $logger
-    ): Application
+    /**
+     * Ability to handle exceptions that may have occurred during bootstrap and launch
+     *
+     * @param Bootstrap $bootstrap
+     * @param \Exception $exception
+     * @return bool
+     */
+    public function catchException(Bootstrap $bootstrap, \Exception $exception): bool
     {
-        if (self::$instance === null) {
-            self::$instance = new self($container, $logger);
+        // Log exceptions if logger is available
+        if ($this->logger) {
+            $this->logger->error('Application error', [
+                'exception' => get_class($exception),
+                'message' => $exception->getMessage(),
+                'file' => $exception->getFile(),
+                'line' => $exception->getLine()
+            ]);
         }
-        return self::$instance;
+
+        // For now, let Bootstrap handle the exception
+        return false;
     }
 }

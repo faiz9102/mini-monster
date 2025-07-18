@@ -5,7 +5,7 @@ namespace Framework\View\Layout;
 use App\ConfigProvider;
 use Framework\View\Block\Template\Helper as LayoutHelper;
 use Framework\FileSystem\ViewFileSystem;
-use Opis\JsonSchema\Validator;
+use Framework\Schema\SchemaFacade;
 
 class LayoutProcessor implements LayoutProcessorInterface
 {
@@ -20,9 +20,9 @@ class LayoutProcessor implements LayoutProcessorInterface
     protected ViewFileSystem $viewFileSystem;
 
     /**
-     * @var Validator
+     * @var SchemaFacade $validator
      */
-    protected Validator $validator;
+    protected SchemaFacade $validator;
 
     /**
      * @var LayoutHelper
@@ -32,7 +32,7 @@ class LayoutProcessor implements LayoutProcessorInterface
     public function __construct(
         LayoutParser $parser,
         ViewFileSystem $viewFileSystem,
-        Validator $validator,
+        SchemaFacade $validator,
         LayoutHelper $helper
     ) {
         $this->parser = $parser;
@@ -100,7 +100,7 @@ class LayoutProcessor implements LayoutProcessorInterface
     public function render(LayoutInterface $layout): string
     {
         // Get the layout file based on the layout identifier
-        $layoutFile = $this->getLayoutFile($layout->getName());
+        $layoutFile = $this->getLayoutFile($layout);
 
         // Check if the layout file exists
         if (file_exists($layoutFile)) {
@@ -118,12 +118,12 @@ class LayoutProcessor implements LayoutProcessorInterface
      * @param string $layoutIdentifier
      * @return string
      */
-    public function getLayoutFile(string $layoutIdentifier): string
+    public function getLayoutFile(LayoutInterface $layout): string
     {
-        $layoutInfo = self::getLayoutInfo($layoutIdentifier);
-        $viewPath = ViewFileSystem::getViewPath(); // Returns Path with trainling slash
+        $layoutInfo = self::getLayoutInfo($layout->getName());
+        $viewPath = ViewFileSystem::getViewPath();
 
-        $layoutFilePath = $viewPath . 'layout' . DIRECTORY_SEPARATOR
+        $layoutFilePath = $viewPath . DIRECTORY_SEPARATOR . 'layout' . DIRECTORY_SEPARATOR
             . $layoutInfo['area'] . DIRECTORY_SEPARATOR
             . $layoutInfo['filePath'] . '.json';
 

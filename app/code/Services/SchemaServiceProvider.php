@@ -2,17 +2,26 @@
 
 namespace App\Services;
 
-use Framework\DI\ServiceProvider;
-use Framework\Schema\Helper\Data as SchemaHelper;
+use Framework\DI\AbstractServiceProvider;
+use Framework\Schema\SchemaFacade;
+use Framework\Schema\Validator;
 use Framework\Schema\Loader;
-use Opis\JsonSchema\Parsers\SchemaParser;
-use Opis\JsonSchema\Resolvers\SchemaResolver;
-use Opis\JsonSchema\Validator;
-use Opis\JsonSchema\Parsers\DefaultVocabulary as Vocabulary;
+use Framework\Schema\Resolver;
+use Framework\Schema\Helper\Data as SchemaHelper;
 
-class SchemaServiceProvider extends ServiceProvider
+class SchemaServiceProvider extends AbstractServiceProvider
 {
     public function register(): void
     {
+        // Register SchemaFacade as a singleton
+        $this->container->bind(SchemaFacade::class, function () {
+            $resolver = $this->container->get(Resolver::class);
+            $loader = new Loader(resolver: $resolver);
+            $validator = new Validator($loader);
+
+            $helper = $this->container->get(SchemaHelper::class);
+
+            return new SchemaFacade($helper, $validator);
+        });
     }
 }

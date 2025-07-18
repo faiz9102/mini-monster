@@ -2,29 +2,33 @@
 
 namespace Framework\Schema;
 
-use Framework\Schema\Loader;
-use Framework\Schema\Validator;
+use Framework\Schema\Helper\Data;
 use Framework\Schema\Helper\Data as SchemaHelper;
+use Framework\Utils\Json\Serializer;
+
 class SchemaFacade
 {
-    private static ?SchemaFacade $instance = null;
     /**
-     * @var Validator
+     * @var string
      */
-    protected $validator;
+    const string SCHEMA_ID_PREFIX = 'schema:///';
 
     /**
-     * @var Loader
+     * @var Validator $validator
      */
-    protected Loader $loader;
+    private Validator $validator;
+    /**
+     * @var SchemaHelper $helper
+     */
+    private SchemaHelper $helper;
 
-    protected SchemaHelper $helper;
-
-    private function __construct()
+    public function __construct(
+        SchemaHelper $helper,
+        Validator    $validator
+    )
     {
-        $this->helper = new SchemaHelper();
-        $this->loader = new Loader();
-        $this->validator = new Validator($this->loader);
+        $this->helper = $helper;
+        $this->validator = $validator;
     }
 
     public function getHelper(): SchemaHelper
@@ -32,9 +36,9 @@ class SchemaFacade
         return $this->helper;
     }
 
-    public function getLoader() : Loader
+    public function getLoader()
     {
-        return $this->loader;
+        return $this->validator->loader();
     }
 
     public function getValidator(): Validator
@@ -42,12 +46,45 @@ class SchemaFacade
         return $this->validator;
     }
 
-    public static function getInstance(): self
+    public function loadFrameworkSchema(): void
     {
-        if (self::$instance === null) {
-            self::$instance = new self();
+        $schemas = Data::discoverSchemaFromFrameworkDir();
+
+        foreach ($schemas as $name => $file) {
+            try {
+                $this->registerSchema($name, $file);
+            } catch (\Exception $e) {
+                error_log("Failed to register schema: {$name} | Error: " . $e->getMessage());
+            }
         }
-        return self::$instance;
     }
 
+    public function validate(string $filePath, string $schemaId): bool
+    {
+        $fileContent = file_get_contents($filePath);
+        $fileContent = json_decode($fileContent, false);
+        $result = $this->validator->validate($fileContent, self::SCHEMA_ID_PREFIX . $schemaId);
+
+        return $result->isValid();
+    }
+
+    public function registerSchema(string $schemaName, string $schemaFile): void
+    {
+        if (!file_exists($schemaFile)) {
+            throw new \Exception("Schema file does not exist: {$schemaFile}");
+        }
+
+        $jsonContent = file_get_contents($schemaFile);
+        $object = Serializer::decode($jsonContent, false);
+
+        $resolver = $this->validator->resolver();
+
+        $isRegistered = $resolver->registerRaw($object, self::SCHEMA_ID_PREFIX . $schemaName);
+
+        if ($isRegistered) {
+            return;
+        }
+
+        throw new \Exception("Failed to register schema: ID: {$schemaName} | File: {$schemaFile}");
+    }
 }

@@ -2,16 +2,16 @@
 
 namespace App\Services;
 
-use Framework\DI\ServiceProvider;
+use Framework\DI\AbstractServiceProvider;
 use Monolog\Handler\RotatingFileHandler;
 use Monolog\Logger;
 use Psr\Log\LoggerInterface;
 
-class LogServiceProvider extends ServiceProvider
+class LogServiceProvider extends AbstractServiceProvider
 {
     public function register(): void
     {
-        $this->container->singleton(LoggerInterface::class, function () {
+        $this->container->bind(LoggerInterface::class, function () {
             $logger = new Logger('app');
 
             // Add a rotating file handler that stores logs in var/log/app.log

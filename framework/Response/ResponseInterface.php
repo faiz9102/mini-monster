@@ -62,4 +62,6 @@ interface ResponseInterface
      * @return void
      */
     public function send(): void;
+
+    public function clearHeaders() : void;
 }

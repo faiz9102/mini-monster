@@ -11,7 +11,7 @@ interface LayoutProcessorInterface
      * @param bool $isAdminLayout Whether the layout is for admin area.
      * @return string The rendered HTML of the layout.
      */
-    public function render(Layout $layout): string;
+    public function render(LayoutInterface $layout): string;
 
-    public function getLayoutFile(string $layoutIdentifier): string;
+    public function getLayoutFile(LayoutInterface $layout): string;
 }

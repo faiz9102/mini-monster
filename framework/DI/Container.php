@@ -4,12 +4,26 @@ namespace Framework\DI;
 
 class Container
 {
-    private static ?Container $instance = null;
-    public array $bindings = [];
-    private array $instances = [];
+    protected static ?Container $instance = null;
+    protected array $bindings = [];
+    protected array $instances = [];
 
-    private function __construct() {} // Prevent direct instantiation
+    private function __construct()
+    {
+        // Prevents direct instantiation
+    }
 
+    private function __clone()
+    {
+        // Prevents cloning
+    }
+
+
+    /**
+     * Returns the singleton instance of the Container.
+     *
+     * @return Container
+     */
     public static function getInstance(): Container
     {
         if (self::$instance === null) {
@@ -18,56 +32,84 @@ class Container
         return self::$instance;
     }
 
-    public function bind(string $abstract, callable $factory): void
-    {
-        $this->bindings[$abstract] = $factory;
-    }
-
-    public function resolve(string $abstract)
+    /**
+     * @param string $type
+     * @param array $args
+     * @return object
+     * @throws \RuntimeException
+     */
+    public function get(string $type, array $args = []) : object
     {
         // Return the singleton instance if resolving the container itself
-        if ($abstract === self::class || $abstract === static::class || $abstract === 'Framework\DI\Container') {
+        if ($type === self::class || $type === static::class || $type === 'Framework\DI\Container') {
             return self::getInstance();
         }
 
         // Return existing instance if available
-        if (isset($this->instances[$abstract])) {
-            return $this->instances[$abstract];
+        if (isset($this->instances[$type])) {
+            return $this->instances[$type];
         }
 
         // Use explicit binding if available
-        if (isset($this->bindings[$abstract])) {
-            $instance = call_user_func($this->bindings[$abstract]);
-            $this->instances[$abstract] = $instance;
+        if (isset($this->bindings[$type])) {
+            $instance = call_user_func($this->bindings[$type]);
+            $this->instances[$type] = $instance;
             return $instance;
-        }
-
-        // Special case for 'config' array
-        if ($abstract === 'config') {
-            return $this->bindings['config'] ? call_user_func($this->bindings['config']) : [];
         }
 
         // Auto-wire if class exists
-        if (class_exists($abstract)) {
+        if (class_exists($type)) {
             try {
-                $instance = $this->autowire($abstract);
+                $instance = $this->autowire($type, $args);
+                $this->instances[$type] = $instance;
+                return $instance;
             } catch (\Exception $e) {
-                return $e->getMessage();
+                // Log the full exception details for debugging
+                error_log("Container autowiring failed for {$type}: " . $e->getMessage() . "\nTrace: " . $e->getTraceAsString());
+                throw new \RuntimeException("Failed to autowire {$type}: " . $e->getMessage(), $e->getCode(), $e);
             }
-            $this->instances[$abstract] = $instance;
-            return $instance;
         }
 
-        throw new \Exception("Cannot resolve {$abstract}");
+        throw new \RuntimeException("Cannot resolve {$type}");
     }
 
-    private function autowire(string $className)
+    /**
+     * Creates a new instance of the specified type.
+     * This method is useful for ensuring that the instance created is not cached
+     *
+     * @param string $type
+     * @param array $args
+     * @return object
+     * @throws \RuntimeException
+     */
+    public function create(string $type, array $args = []): object
     {
-        // Prevent autowiring the container itself
-        if ($className === self::class || $className === static::class || $className === 'Framework\DI\Container') {
+        // Prevent creating the container itself
+        if ($type === self::class || $type === static::class || $type === 'Framework\DI\Container') {
             return self::getInstance();
         }
 
+        // Use explicit binding if available
+        if (isset($this->bindings[$type])) {
+            return call_user_func($this->bindings[$type], $args);
+        }
+        // Auto-wire if class exists
+        if (class_exists($type)) {
+            try {
+                return $this->autowire($type, $args);
+            } catch (\Exception $e) {
+                throw new \RuntimeException("Failed to create instance of {$type}: " . $e->getMessage());
+            }
+        }
+
+        throw new \RuntimeException("Cannot create instance of {$type}: class does not exist.");
+    }
+
+    /**
+     * Auto-wire a class and its dependencies
+     */
+    private function autowire(string $className, array $args = [])
+    {
         $reflector = new \ReflectionClass($className);
 
         if (!$reflector->isInstantiable()) {
@@ -76,78 +118,147 @@ class Container
 
         $constructor = $reflector->getConstructor();
 
-        // If no constructor, just return new instance
         if ($constructor === null) {
-            return new $className();
+            // If no constructor and we have args, check if class has a $_data property or method to handle it
+            $instance = new $className();
+            $this->injectDataIfSupported($instance, $args);
+            return $instance;
         }
 
-        // Get constructor parameters
+        /**
+         * @var \ReflectionParameter[] $parameters
+         */
         $parameters = $constructor->getParameters();
 
         if (count($parameters) === 0) {
-            return new $className();
+            // If constructor has no parameters, but we have args, try to set $_data property
+            $instance = new $className();
+            $this->injectDataIfSupported($instance, $args);
+            return $instance;
         }
 
-        // Resolve each parameter
+        /**
+         * Resolve each parameter
+         */
         $dependencies = [];
+
         foreach ($parameters as $parameter) {
+            // Check if this parameter should be filled with our extra args
+            if ($parameter->getName() === '_data' && !empty($args)) {
+                $dependencies[] = $args;
+                continue;
+            }
+
             $type = $parameter->getType();
 
-            // Handle array $config = [] injection
-            if ($parameter->getName() === 'config' && $type && $type->getName() === 'array') {
-                $dependencies[] = $this->resolve('config');
-            } elseif ($type === null || $type->isBuiltin()) {
+            if ($type === null || $type->isBuiltin()) {
                 if ($parameter->isDefaultValueAvailable()) {
                     $dependencies[] = $parameter->getDefaultValue();
                 } else {
                     throw new \Exception("Cannot resolve parameter {$parameter->getName()} in {$className}");
                 }
             } else {
-                $dependencies[] = $this->resolve($type->getName());
+                $dependencies[] = $this->get($type->getName());
             }
         }
 
-        // Create new instance with dependencies
-        return $reflector->newInstanceArgs($dependencies);
+        // Create a new instance with resolved dependencies
+        $instance = $reflector->newInstanceArgs($dependencies);
+        $this->injectDataIfSupported($instance, $args);
+        return $instance;
     }
 
-    // Add this method to your Container class
+    /**
+     * Inject data into object if it supports DataInjectable trait
+     */
+    private function injectDataIfSupported(object $instance, array $args): void
+    {
+        if (method_exists($instance, '_setData')) {
+            $instance->_setData($args);
+        }
+    }
+
+    /**
+     * @param string $type
+     * @param callable $factory
+     * @return void
+     */
+    public function bind(string $type, callable $factory): void
+    {
+        $this->bindings[$type] = $factory;
+    }
+
+    /**
+     * Binds an interface to a concrete class.
+     * So whenever the interface is requested,
+     * the container will provide the concrete class.
+     *
+     * @param string $interface
+     * @param string $concrete
+     * @return void
+     */
     public function bindInterface(string $interface, string $concrete): void
     {
         $this->bind($interface, function () use ($concrete) {
-            return $this->resolve($concrete);
+            return $this->get($concrete);
         });
     }
 
-    // Add to Container class
-    public function registerProvider(string $providerClass): void
+    /**
+     * Registers a service provider class bindings
+     * and Registers it with the container.
+     *
+     * @param string $class
+     * @return void
+     */
+    public function registerProvider(string $class) : void
     {
-        $provider = new $providerClass($this);
+        if (!class_exists($class)) {
+            throw new \RuntimeException("Service provider class {$class} does not exist.");
+        }
+
+        if (!is_subclass_of($class, AbstractServiceProvider::class)) {
+            throw new \RuntimeException("Service provider {$class} must extend " . AbstractServiceProvider::class);
+        }
+
+        /** @var \Framework\DI\AbstractServiceProvider $provider */
+        $provider = $this->get($class);
+
+        if (!method_exists($provider, 'register')) {
+            throw new \RuntimeException("Service provider {$class} must implement a register method.");
+        }
+
         $provider->register();
     }
 
-    // Add to Container class
-    public function singleton(string $abstract, callable $factory): void
+    public function findAndLoadServiceProviders(string $directory = __DIR__ . "/../../app/code/Services"): void
     {
-        $this->bind($abstract, function () use ($abstract, $factory) {
-            $instance = call_user_func($factory);
-            $this->instances[$abstract] = $instance;
-            return $instance;
-        });
-    }
-
-    // Add to Container class
-    public function scanAndRegister(string $directory, string $namespace): void
-    {
-        $files = glob($directory . '/*.php');
-        foreach ($files as $file) {
-            $className = $namespace . '\\' . pathinfo($file, PATHINFO_FILENAME);
-            if (class_exists($className)) {
-                // Register class in container
-                $this->bind($className, function () use ($className) {
-                    return $this->autowire($className);
-                });
-            }
+        if (!is_dir($directory)) {
+            throw new \RuntimeException("Directory {$directory} does not exist.");
         }
+
+        $files = glob($directory . DIRECTORY_SEPARATOR . '*ServiceProvider.php');
+
+        foreach ($files as $index => $file) {
+            $files[$index] = realpath($file);
+        }
+
+        $className = [];
+
+        foreach ($files as $index => $filePath) {
+            require_once $filePath;
+            $className[$index] = "App\\Services\\" . pathinfo($filePath, PATHINFO_FILENAME);
+            $this->registerProvider($className[$index]);
+        }
+
+
+        foreach ($className as $class) {
+            /**
+             * @var \Framework\DI\AbstractServiceProvider $instance
+             */
+            $instance = $this->get($class);
+            $instance->boot();
+        }
+
     }
 }

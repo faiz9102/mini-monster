@@ -50,24 +50,20 @@ class Layout implements LayoutInterface
      */
     public function render(): string
     {
-        // Basic implementation - can be expanded as needed
-        $output = '';
+//        $output = '';
+//
+//        $templatePath = $this->getTemplatePath();
+//        if (file_exists($templatePath)) {
+//            ob_start();
+//            include $templatePath;
+//            $output = ob_get_clean();
+//        }
+//        if (empty($output)) {
+//            foreach ($this->_Blocks as $block) {
+//                $output .= $block->toHtml();
+//            }
+//        }
 
-        // You might want to load the template file here and process it
-        $templatePath = $this->getTemplatePath();
-        if (file_exists($templatePath)) {
-            ob_start();
-            include $templatePath;
-            $output = ob_get_clean();
-        }
-
-        // If no template or template doesn't exist, render blocks directly
-        if (empty($output)) {
-            foreach ($this->_Blocks as $block) {
-                $output .= $block->toHtml();
-            }
-        }
-
-        return $output;
+        return '<h1>Faiz Said Hi!</h1>';
     }
 }

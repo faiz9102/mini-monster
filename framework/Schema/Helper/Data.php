@@ -15,7 +15,14 @@ class Data
         return FileSystem::getRootPath() . '/framework';
     }
 
-    public static function diccoverSchemaFromFrameworkDir(): array
+    /**
+     * Discover schema files in the framework directory.
+     * And return an associative array where the key is the schema name
+     * e.g. ["layout" => "framework/Layout/layout-schema.json"]
+     *
+     * @return array
+     */
+    public static function discoverSchemaFromFrameworkDir(): array
     {
         $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator(self::getFrameworkDirectory()));
         $schemaFiles = [];

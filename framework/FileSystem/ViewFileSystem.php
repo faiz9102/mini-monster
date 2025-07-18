@@ -16,12 +16,9 @@ class ViewFileSystem extends FileSystem implements FileSystemInterface
      */
     public static function getViewPath(): string
     {
-        $path = ConfigProvider::getViewDir();
+        $directory = ConfigProvider::getViewDir();
+        $viewPath = self::getRootPath() . '/' . $directory;
 
-        if (!str_ends_with($path, DIRECTORY_SEPARATOR)) {
-            $path .= DIRECTORY_SEPARATOR;
-        }
-
-        return trim($path);
+        return trim($viewPath);
     }
 }
