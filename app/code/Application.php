@@ -4,6 +4,7 @@ namespace App;
 
 use Framework\App\AppInterface;
 use Framework\App\Bootstrap;
+use Framework\App\RequestContext;
 use Framework\DI\Container;
 use Framework\Response\ResponseInterface;
 use Framework\Response\Result\Page;
@@ -38,21 +39,25 @@ class Application implements AppInterface
      */
     public function launch(): ResponseInterface
     {
+        /** @var RequestContext $requestContext */
+        $requestContext = $this->container->get(RequestContext::class);
+
         $path = trim(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/');
         $parts = array_values(array_filter(explode('/', $path)));
+
 
         $backend = $this->config->get('backend', []);
         $frontName = is_array($backend) ? ($backend['frontName'] ?? '') : '';
         if (isset($parts[0]) && $parts[0] === $frontName) {
             array_shift($parts);
-            $isAdminUrl = true;
+            $requestContext->setIsAdmin(true);
         }
 
         $controllerName = $parts[0] ?? 'index';
         $actionName = $parts[1] ?? 'index';
 
         $controllerClass = 'App\\Controllers\\' .
-            (isset($isAdminUrl) && $isAdminUrl ? 'Adminhtml\\' : '') .
+            ($requestContext->isAdmin() ? 'Adminhtml\\' : '') .
             ucfirst($controllerName) . '\\' . ucfirst($actionName);
         $actionMethod = 'execute';
 
@@ -62,13 +67,20 @@ class Application implements AppInterface
                 'controller' => $controllerClass,
                 'action' => $actionMethod,
                 'path' => $path,
-                'isAdmin' => isset($isAdminUrl) && $isAdminUrl
+                'isAdmin' => $requestContext->isAdmin()
             ]);
         }
 
         if (class_exists($controllerClass) && method_exists($controllerClass, $actionMethod)) {
             // Let the container create the controller with all dependencies
+            /**
+             * @var \Framework\Controllers\AbstractAction $controller
+             */
             $controller = $this->container->get($controllerClass);
+            $controller->_setData([
+                'isAdmin' => true
+            ]);
+
             return $controller->$actionMethod();
         } else {
             if ($this->logger) {

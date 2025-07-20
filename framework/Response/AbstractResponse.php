@@ -13,12 +13,10 @@ abstract class AbstractResponse implements ResponseInterface
     protected string $body = '';
 
     public function __construct(
-        $body,
         int $responseCode = 200,
         array $headers = [],
         string $contentType = 'text/plain',
     ) {
-        $this->setBody($body);
         $this->responseCode = $responseCode;
         $this->headers = $headers;
         $this->contentType = $contentType;

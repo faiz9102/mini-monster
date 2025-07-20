@@ -3,14 +3,15 @@
 namespace Framework\Controllers\Adminhtml;
 
 use Framework\Controllers\ActionInterface as BaseActionInterface;
+use Framework\Controllers\AbstractAction as BaseAbstractAction;
 use Framework\Response\ResponseInterface;
 
-abstract class AbstractAction implements BaseActionInterface
+abstract class AbstractAction extends BaseAbstractAction implements BaseActionInterface
 {
     /**
      * Execute the action.
      *
-     * @return void
+     * @return ResponseInterface
      */
     abstract public function execute() : ResponseInterface;
 

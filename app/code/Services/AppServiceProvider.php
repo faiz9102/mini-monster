@@ -31,5 +31,17 @@ class AppServiceProvider extends AbstractServiceProvider
                 $this->container->get(LoggerInterface::class)
             );
         });
+
+        $this->container->bindSingleton(
+            ConfigProvider::class,
+            function () {
+                return ConfigProvider::getInstance();
+            }
+        );
+    }
+
+    public function boot(): void
+    {
+        $this->container->get(\Framework\App\RequestContext::class);
     }
 }

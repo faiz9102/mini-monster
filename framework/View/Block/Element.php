@@ -1,9 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Framework\View\Block\Template;
-
-use Framework\View\Block\Template\BlockElementInterface;
+namespace Framework\View\Block;
 
 class Element implements BlockElementInterface
 {
@@ -13,8 +11,7 @@ class Element implements BlockElementInterface
     private string $name;
     private ?string $template;
 
-
-    public function __construct(string $name, ?string $template = null, array $data = [], array $children = [])
+    public function __construct(string $name = '', ?string $template = null, array $data = [], array $children = [])
     {
         $this->name = $name;
         $this->template = $template;
@@ -66,8 +63,38 @@ class Element implements BlockElementInterface
         return $this;
     }
 
+
     public function isAdminBlock(): bool
     {
         return false;
+    }
+
+    public function _toHtml(): string
+    {
+        $templateFile = $this->getTemplatePath();
+
+        if (!file_exists($templateFile)) {
+            throw new \RuntimeException("Template file not found: $templateFile");
+        }
+
+        extract($this->data); // make $data['foo'] become $foo
+
+        ob_start();
+        include $templateFile;
+        return ob_get_clean();
+    }
+
+    public function getTemplatePath(string $templateIdentifier = ''): ?string
+    {
+        $templateParts = explode("::", $templateIdentifier ?: $this->template);
+
+        if (count($templateParts) < 2) {
+            throw new \RuntimeException("Invalid template path: {$this->template}");
+        }
+
+        $area = $templateParts[0];
+        $basePath = \Framework\FileSystem\ViewFileSystem::getViewPath() . DIRECTORY_SEPARATOR . 'template';
+        $filePath = $area . DIRECTORY_SEPARATOR . $templateParts[1];
+        return $basePath . DIRECTORY_SEPARATOR . $filePath;
     }
 }

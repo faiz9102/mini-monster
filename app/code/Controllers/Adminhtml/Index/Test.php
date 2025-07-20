@@ -7,7 +7,7 @@ use Framework\Controllers\Adminhtml\AbstractAction;
 use Framework\Response\ResponseInterface;
 use Framework\Response\Result\Page;
 
-class Index extends AbstractAction
+class Test extends AbstractAction
 {
     private Page $response;
     public function __construct(Page $page)

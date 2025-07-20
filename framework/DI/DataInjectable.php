@@ -17,7 +17,7 @@ trait DataInjectable
     /**
      * Get data by key or return entire data array
      */
-    protected function _getData(string $key = null): mixed
+    protected function _getData(?string $key): mixed
     {
         if ($key === null) {
             return $this->_data;

@@ -108,7 +108,7 @@ class Container
     /**
      * Auto-wire a class and its dependencies
      */
-    private function autowire(string $className, array $args = [])
+    private function autowire(string $className, array $args = []): object
     {
         $reflector = new \ReflectionClass($className);
 
@@ -119,52 +119,47 @@ class Container
         $constructor = $reflector->getConstructor();
 
         if ($constructor === null) {
-            // If no constructor and we have args, check if class has a $_data property or method to handle it
             $instance = new $className();
             $this->injectDataIfSupported($instance, $args);
             return $instance;
         }
 
-        /**
-         * @var \ReflectionParameter[] $parameters
-         */
         $parameters = $constructor->getParameters();
-
-        if (count($parameters) === 0) {
-            // If constructor has no parameters, but we have args, try to set $_data property
-            $instance = new $className();
-            $this->injectDataIfSupported($instance, $args);
-            return $instance;
-        }
-
-        /**
-         * Resolve each parameter
-         */
         $dependencies = [];
+        $usedArgs = [];
 
         foreach ($parameters as $parameter) {
-            // Check if this parameter should be filled with our extra args
-            if ($parameter->getName() === '_data' && !empty($args)) {
-                $dependencies[] = $args;
+            $paramName = $parameter->getName();
+            $type = $parameter->getType();
+
+            // 1. Use explicitly passed $args (by name)
+            if (array_key_exists($paramName, $args)) {
+                $dependencies[] = $args[$paramName];
+                $usedArgs[] = $paramName;
                 continue;
             }
 
-            $type = $parameter->getType();
-
-            if ($type === null || $type->isBuiltin()) {
-                if ($parameter->isDefaultValueAvailable()) {
-                    $dependencies[] = $parameter->getDefaultValue();
-                } else {
-                    throw new \Exception("Cannot resolve parameter {$parameter->getName()} in {$className}");
-                }
-            } else {
+            // 2. Try resolving non-built-in types from container
+            if ($type && !$type->isBuiltin()) {
                 $dependencies[] = $this->get($type->getName());
+                continue;
             }
+
+            // 3. Fallback to default values
+            if ($parameter->isDefaultValueAvailable()) {
+                $dependencies[] = $parameter->getDefaultValue();
+                continue;
+            }
+
+            throw new \Exception("Cannot resolve parameter \${$paramName} for {$className}");
         }
 
-        // Create a new instance with resolved dependencies
         $instance = $reflector->newInstanceArgs($dependencies);
-        $this->injectDataIfSupported($instance, $args);
+
+        // Filter out used args, pass remaining to _setData
+        $remainingArgs = array_diff_key($args, array_flip($usedArgs));
+        $this->injectDataIfSupported($instance, $remainingArgs);
+
         return $instance;
     }
 
@@ -202,6 +197,17 @@ class Container
         $this->bind($interface, function () use ($concrete) {
             return $this->get($concrete);
         });
+    }
+
+    public function bindSingleton(string $type, callable $factory): void
+    {
+        // Bind a singleton instance to the container
+        $this->bindings[$type] = function () use ($type,$factory) {
+            if (!isset($this->instances[$type])) {
+                $this->instances[$type] = $factory();
+            }
+            return $this->instances[$type];
+        };
     }
 
     /**

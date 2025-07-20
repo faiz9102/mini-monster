@@ -1,6 +1,6 @@
 <?php
 
-namespace framework\View\Layout;
+namespace Framework\View\Layout;
 
 use Framework\Utils\Json\Serializer;
 
@@ -12,7 +12,7 @@ class LayoutParser
      * @param string $layoutFile The path to the layout file.
      * @return array The layout config array.
      */
-    public function parse(string $layoutFile): array
+    public static function parse(string $layoutFile): array
     {
         if (!file_exists($layoutFile)) {
             throw new \InvalidArgumentException("Layout file does not exist: $layoutFile");

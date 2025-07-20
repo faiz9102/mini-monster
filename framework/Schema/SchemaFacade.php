@@ -68,6 +68,19 @@ class SchemaFacade
         return $result->isValid();
     }
 
+    public function validateAndReturnContent(string $filePath, string $schemaId): array
+    {
+        $fileContent = file_get_contents($filePath);
+        $fileContent = json_decode($fileContent, false);
+        $result = $this->validator->validate($fileContent, self::SCHEMA_ID_PREFIX . $schemaId);
+
+        if ($result->isValid()) {
+            return (array)$fileContent;
+        }
+
+        throw new \Exception("Validation failed for schema ID: {$schemaId} | File: {$filePath}");
+    }
+
     public function registerSchema(string $schemaName, string $schemaFile): void
     {
         if (!file_exists($schemaFile)) {

@@ -4,10 +4,13 @@ declare(strict_types=1);
 namespace Framework\Controllers;
 
 use Framework\Controllers\ActionInterface as BaseActionInterface;
+use Framework\DI\DataInjectable;
 use Framework\Response\ResponseInterface;
 
 abstract class AbstractAction implements BaseActionInterface
 {
+    use DataInjectable;
+
     /**
      * Execute the action.
      *
