@@ -3,8 +3,8 @@
 namespace App\Services;
 
 use Framework\DI\AbstractServiceProvider;
+use Framework\View\Layout\Interfaces\LayoutInterface;
 use Framework\View\Layout\Layout;
-use Framework\View\Layout\LayoutInterface;
 use Framework\View\Processors\ElementProcessor;
 use Framework\View\Processors\Interfaces\ElementProcessorInterface;
 use Framework\View\Processors\Interfaces\LayoutProcessorInterface;

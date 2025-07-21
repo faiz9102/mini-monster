@@ -2,7 +2,9 @@
 
 namespace Framework\DI;
 
-abstract class AbstractServiceProvider
+use Framework\DI\Interfaces\ServiceProviderInterface;
+
+abstract class AbstractServiceProvider implements ServiceProviderInterface
 {
     protected Container $container;
 

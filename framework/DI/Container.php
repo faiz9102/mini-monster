@@ -2,7 +2,9 @@
 
 namespace Framework\DI;
 
-class Container
+use Framework\DI\Interfaces\ContainerInterface;
+
+class Container implements ContainerInterface
 {
     protected static ?Container $instance = null;
     protected array $bindings = [];
@@ -20,11 +22,9 @@ class Container
 
 
     /**
-     * Returns the singleton instance of the Container.
-     *
-     * @return Container
+     * @inheritDoc
      */
-    public static function getInstance(): Container
+    public static function getInstance(): ContainerInterface
     {
         if (self::$instance === null) {
             self::$instance = new self();
@@ -32,11 +32,9 @@ class Container
         return self::$instance;
     }
 
+
     /**
-     * @param string $type
-     * @param array $args
-     * @return object
-     * @throws \RuntimeException
+     * @inheritDoc
      */
     public function get(string $type, array $args = []) : object
     {
@@ -74,13 +72,7 @@ class Container
     }
 
     /**
-     * Creates a new instance of the specified type.
-     * This method is useful for ensuring that the instance created is not cached
-     *
-     * @param string $type
-     * @param array $args
-     * @return object
-     * @throws \RuntimeException
+     * @inheritDoc
      */
     public function create(string $type, array $args = []): object
     {

@@ -2,13 +2,12 @@
 
 namespace App\Services;
 
+use Framework\Application;
+use Framework\ConfigProvider;
 use Framework\DI\AbstractServiceProvider;
-use App\Application;
-use Psr\Log\LoggerInterface;
-use Framework\Response\ResponseInterface;
+use Framework\Logger\Interfaces\LoggerInterface;
+use Framework\Response\Interfaces\ResponseInterface;
 use Framework\Response\Result\Page;
-use Framework\Logger\Logger;
-use App\ConfigProvider;
 
 class AppServiceProvider extends AbstractServiceProvider
 {
@@ -25,7 +24,7 @@ class AppServiceProvider extends AbstractServiceProvider
             }
         );
 
-        $this->container->bind(Application::class, function () {
+        $this->container->bindSingleton(Application::class, function () {
             return new Application(
                 $this->container,
                 $this->container->get(LoggerInterface::class)
@@ -42,6 +41,7 @@ class AppServiceProvider extends AbstractServiceProvider
 
     public function boot(): void
     {
+        // Initializing the RequestContext class so its shared instance is available ASAP
         $this->container->get(\Framework\App\RequestContext::class);
     }
 }

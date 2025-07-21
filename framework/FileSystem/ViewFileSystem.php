@@ -2,22 +2,20 @@
 
 namespace Framework\FileSystem;
 
-use Framework\FileSystem\FileSystem;
-use Framework\FileSystem\FileSystemInterface;
-use App\ConfigProvider;
+use Framework\ConfigProvider;
+use Framework\FileSystem\Interfaces\ViewFileSystemInterface;
 
-class ViewFileSystem extends FileSystem implements FileSystemInterface
+class ViewFileSystem extends FileSystem implements ViewFileSystemInterface
 {
     /**
-     * Get the view path with a trailing directory separator.
+     * Get the base view path
      *
-     * @param string $viewFile
      * @return string
      */
     public static function getViewPath(): string
     {
-        $directory = ConfigProvider::getViewDir();
-        $viewPath = self::getRootPath() . '/' . $directory;
+        $directory = ConfigProvider::getInstance()->get("view", 'view');
+        $viewPath = self::getRootPath() . DIRECTORY_SEPARATOR . $directory;
 
         return trim($viewPath);
     }

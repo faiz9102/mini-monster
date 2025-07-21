@@ -2,13 +2,14 @@
 
 namespace App;
 
-use Framework\App\AppInterface;
 use Framework\App\Bootstrap;
+use Framework\App\Interfaces\AppInterface;
 use Framework\App\RequestContext;
+use Framework\ConfigProvider;
 use Framework\DI\Container;
-use Framework\Response\ResponseInterface;
+use Framework\Logger\Interfaces\LoggerInterface;
+use Framework\Response\Interfaces\ResponseInterface;
 use Framework\Response\Result\Page;
-use Psr\Log\LoggerInterface;
 
 class Application implements AppInterface
 {
@@ -16,6 +17,9 @@ class Application implements AppInterface
     private ConfigProvider $config;
     private LoggerInterface $logger;
 
+    /**
+     * Application constructor
+     */
     public function __construct(Container $container, LoggerInterface $logger)
     {
         $this->logger = $logger;
@@ -39,43 +43,77 @@ class Application implements AppInterface
      */
     public function launch(): ResponseInterface
     {
+        // Get the request context from container
         /** @var RequestContext $requestContext */
         $requestContext = $this->container->get(RequestContext::class);
 
+        // Parse URL and determine if we're in admin mode
         $path = trim(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/');
-        $parts = array_values(array_filter(explode('/', $path)));
+        $pathParts = array_values(array_filter(explode('/', $path)));
 
+        // Check if we're in admin area
+        $this->checkAndSetAdminArea($requestContext, $pathParts);
 
-        $backend = $this->config->get('backend', []);
-        $frontName = is_array($backend) ? ($backend['frontName'] ?? '') : '';
-        if (isset($parts[0]) && $parts[0] === $frontName) {
-            array_shift($parts);
-            $requestContext->setIsAdmin(true);
-        }
+        // Resolve controller and action names
+        $controllerName = $pathParts[0] ?? 'index';
+        $actionName = $pathParts[1] ?? 'index';
 
-        $controllerName = $parts[0] ?? 'index';
-        $actionName = $parts[1] ?? 'index';
-
-        $controllerClass = 'App\\Controllers\\' .
-            ($requestContext->isAdmin() ? 'Adminhtml\\' : '') .
-            ucfirst($controllerName) . '\\' . ucfirst($actionName);
+        // Build the controller class name
+        $controllerClass = $this->buildControllerClassName($requestContext, $controllerName, $actionName);
         $actionMethod = 'execute';
 
-        // Log route information if logger is available
-        if ($this->logger) {
-            $this->logger->info('Route dispatched', [
-                'controller' => $controllerClass,
-                'action' => $actionMethod,
-                'path' => $path,
-                'isAdmin' => $requestContext->isAdmin()
-            ]);
-        }
+        // Log route information
+        $this->logRouteInformation($controllerClass, $actionMethod, $path, $requestContext->isAdmin());
 
+        // Try to dispatch to the controller
+        return $this->dispatchController($controllerClass, $actionMethod, $controllerName, $actionName);
+    }
+
+    /**
+     * Check if request is for admin area and update request context
+     */
+    private function checkAndSetAdminArea(RequestContext $requestContext, array &$pathParts): void
+    {
+        $backend = $this->config->get('backend', []);
+        $frontName = is_array($backend) ? ($backend['frontName'] ?? '') : '';
+
+        if (!empty($pathParts[0]) && $pathParts[0] === $frontName) {
+            array_shift($pathParts);    // remove admin front name from path parts
+            $requestContext->setIsAdmin(true);
+        }
+    }
+
+    /**
+     * Build controller class name based on request parts
+     */
+    private function buildControllerClassName(RequestContext $requestContext, string $controllerName, string $actionName): string
+    {
+        return 'App\\Controllers\\' .
+            ($requestContext->isAdmin() ? 'Adminhtml\\' : '') .
+            ucfirst($controllerName) . '\\' . ucfirst($actionName);
+    }
+
+    /**
+     * Log route dispatch information
+     */
+    private function logRouteInformation(string $controllerClass, string $actionMethod, string $path, bool $isAdmin): void
+    {
+        $this->logger->info('Route dispatched', [
+            'controller' => $controllerClass,
+            'action' => $actionMethod,
+            'path' => $path,
+            'isAdmin' => $isAdmin
+        ]);
+    }
+
+    /**
+     * Dispatch to controller if exists, or return 404
+     */
+    private function dispatchController(string $controllerClass, string $actionMethod, string $controllerName, string $actionName): ResponseInterface
+    {
         if (class_exists($controllerClass) && method_exists($controllerClass, $actionMethod)) {
             // Let the container create the controller with all dependencies
-            /**
-             * @var \Framework\Controllers\AbstractAction $controller
-             */
+            /** @var \Framework\Controllers\AbstractAction $controller */
             $controller = $this->container->get($controllerClass);
             $controller->_setData([
                 'isAdmin' => true
@@ -89,7 +127,7 @@ class Application implements AppInterface
                     'action' => $actionMethod
                 ]);
             }
-            
+
             // Return a 404 response
             $response = $this->container->get(Page::class);
             $response->setStatusCode(404);
@@ -99,7 +137,7 @@ class Application implements AppInterface
     }
 
     /**
-     * Ability to handle exceptions that may have occurred during bootstrap and launch
+     * Handle exceptions that occurred during bootstrap and launch
      *
      * @param Bootstrap $bootstrap
      * @param \Exception $exception

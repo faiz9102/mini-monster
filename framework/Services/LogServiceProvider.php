@@ -4,8 +4,8 @@ namespace App\Services;
 
 use Framework\DI\AbstractServiceProvider;
 use Monolog\Handler\RotatingFileHandler;
-use Monolog\Logger;
-use Psr\Log\LoggerInterface;
+use Framework\Logger\Logger;
+use Framework\Logger\Interfaces\LoggerInterface;
 
 class LogServiceProvider extends AbstractServiceProvider
 {
@@ -15,8 +15,8 @@ class LogServiceProvider extends AbstractServiceProvider
             $logger = new Logger('app');
 
             // Add a rotating file handler that stores logs in var/log/app.log
-            $logPath = __DIR__ . '/../../../var/log/app.log';
-            $handler = new RotatingFileHandler($logPath, 0, Logger::DEBUG);
+            $logPath = \Framework\FileSystem\BaseFileSystem::getRootPath() . '/var/log/app.log';
+            $handler = new RotatingFileHandler($logPath, 0, \Monolog\Level::Debug);
             $logger->pushHandler($handler);
 
             return $logger;
