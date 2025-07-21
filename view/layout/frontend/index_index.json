@@ -3,13 +3,13 @@
     "version": "1.0.0",
     "id": "adminhtml:index_index",
     "title": "Admin Homepage",
-    "description": "Layout for the admin homepage",
-    "page": "default_login_form",
+    "description": "Layout for the frontend homepage",
+    "page": "default_homepage",
     "components": [
       {
         "name": "index.index",
         "type": "block",
-        "class": "Framework\\View\\Block\\Adminhtml\\Element",
+        "class": "Framework\\View\\Block\\Element",
         "template": "adminhtml::index/index.phtml",
         "arguments": {
           "data": {
@@ -22,21 +22,21 @@
       {
         "name": "index.index.sidebar",
         "type": "block",
-        "class": "Framework\\View\\Block\\Adminhtml\\Element",
+        "class": "Framework\\View\\Block\\Element",
         "template": "adminhtml::index/sidebar.phtml",
         "arguments": {
           "data": {
-            "area": "adminhtml"
+            "area": "frontend"
           },
           "children": {
             "menu": {
               "name": "index.index.sidebar.menu.heading",
               "type": "block",
-              "class": "Framework\\View\\Block\\Adminhtml\\Element",
+              "class": "Framework\\View\\Block\\Element",
               "template": "adminhtml::index/sidebar/menu.phtml",
               "arguments": {
                 "data": {
-                  "area": "adminhtml"
+                  "area": "frontend"
                 }
               }
             }
@@ -46,11 +46,11 @@
           {
             "name": "index.index.sidebar.menu.items",
             "type": "block",
-            "class": "Framework\\View\\Block\\Adminhtml\\Element",
+            "class": "Framework\\View\\Block\\Element",
             "template": "adminhtml::index/sidebar/menu.phtml",
             "arguments": {
               "data": {
-                "area": "adminhtml"
+                "area": "frontend"
               }
             },
             "children": []
