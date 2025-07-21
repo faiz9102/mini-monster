@@ -2,15 +2,15 @@
 namespace App\Controllers\Index;
 
 use Framework\Controllers\AbstractAction;
+use Framework\Response\ResponseInterface;
 use Framework\Response\Result\Page;
 
 class Index extends AbstractAction
 {
-
     /**
      * @var Page
      */
-    protected $view;
+    protected $page;
 
     /**
      * Index constructor.
@@ -19,14 +19,14 @@ class Index extends AbstractAction
      */
     public function __construct(Page $view)
     {
-        $this->view = $view;
+        $this->page = $view;
     }
 
     /**
-     * @return \Framework\Response\ResponseInterface
+     * @return ResponseInterface
      */
-    public function execute(): \Framework\Response\ResponseInterface
+    public function execute(): ResponseInterface
     {
-        return $this->view;
+        return $this->page;
     }
 }

@@ -9,10 +9,10 @@ use Framework\Response\Result\Page;
 
 class Index extends AbstractAction
 {
-    private Page $response;
+    private Page $page;
     public function __construct(Page $page)
     {
-        $this->response = $page;
+        $this->page = $page;
     }
 
     /**
@@ -23,6 +23,6 @@ class Index extends AbstractAction
     public function execute() : ResponseInterface
     {
         // Render the admin index page
-        return $this->response;
+        return $this->page;
     }
 }
