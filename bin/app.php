@@ -3,15 +3,16 @@
 require __DIR__ . '/../vendor/autoload.php';
 require __DIR__ . '/../app/bootstrap.php';
 
-echo "PHP REPL - Press Enter for new line, type 'exec' to execute, 'clear' to clear buffer, 'exit' or 'quit' to stop\n";
+echo "PHP REPL - Press Enter for new line, type 'exec' to execute, 'clear' to clear buffer, 'exit' or 'quit' to stop
+To access DI container, use \$container\n\n";
 
 $buffer = '';
 
 while (true) {
-    $input = readline("php> ");
+    $input = readline("=> ");
 
     // Strip the prompt if it was pasted in
-    $input = preg_replace('/^php>\s*/', '', $input);
+    $input = preg_replace('/^=>\s*/', '', $input);
 
     // Check for exit commands
     if (in_array(trim($input), ['exit', 'quit'])) {
