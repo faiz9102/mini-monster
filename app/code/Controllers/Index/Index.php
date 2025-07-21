@@ -2,7 +2,7 @@
 namespace App\Controllers\Index;
 
 use Framework\Controllers\AbstractAction;
-use Framework\Response\ResponseInterface;
+use Framework\Response\Interfaces\ResponseInterface;
 use Framework\Response\Result\Page;
 
 class Index extends AbstractAction
