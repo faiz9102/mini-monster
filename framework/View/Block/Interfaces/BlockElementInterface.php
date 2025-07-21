@@ -1,6 +1,6 @@
 <?php
 
-namespace Framework\View\Block;
+namespace Framework\View\Block\Interfaces;
 
 interface BlockElementInterface
 {

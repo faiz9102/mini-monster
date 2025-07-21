@@ -3,15 +3,17 @@ declare(strict_types=1);
 
 namespace Framework\View\Block;
 
+use Framework\View\Block\Interfaces\BlockElementInterface;
+
 class Element implements BlockElementInterface
 {
     private array $data;
 
     private array $children;
     private string $name;
-    private ?string $template;
+    private string $template;
 
-    public function __construct(string $name = '', ?string $template = null, array $data = [], array $children = [])
+    public function __construct(string $name,string $template , array $data = [], array $children = [])
     {
         $this->name = $name;
         $this->template = $template;
@@ -71,31 +73,18 @@ class Element implements BlockElementInterface
 
     public function _toHtml(): string
     {
-        $templateFile = $this->getTemplatePath();
+        $templateFile = \Framework\View\Block\Helper\Data::getTemplatePath($this->template);
 
         if (!file_exists($templateFile)) {
             throw new \RuntimeException("Template file not found: $templateFile");
         }
 
+        // the data in the data array will come from the layout file
         extract($this->data); // make $data['foo'] become $foo
         $block = $this;
 
         ob_start();
-        include $templateFile;
+        require $templateFile;
         return ob_get_clean();
-    }
-
-    public function getTemplatePath(string $templateIdentifier = ''): ?string
-    {
-        $templateParts = explode("::", $templateIdentifier ?: $this->template);
-
-        if (count($templateParts) < 2) {
-            throw new \RuntimeException("Invalid templates path: {$this->template}");
-        }
-
-        $area = $templateParts[0];
-        $basePath = \Framework\FileSystem\ViewFileSystem::getViewPath() . DIRECTORY_SEPARATOR . 'templates';
-        $filePath = $area . DIRECTORY_SEPARATOR . $templateParts[1];
-        return $basePath . DIRECTORY_SEPARATOR . $filePath;
     }
 }

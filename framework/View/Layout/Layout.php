@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace Framework\View\Layout;
 
+use Framework\View\Layout\Interfaces\LayoutInterface;
+
 /**
  * Layout class for managing layout templates and blocks.
  */

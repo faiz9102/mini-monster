@@ -2,8 +2,8 @@
 
 namespace Framework\View\Processors\Interfaces;
 
+use Framework\View\Layout\Interfaces\LayoutInterface;
 use Framework\View\Layout\LayoutConfig;
-use Framework\View\Layout\LayoutInterface;
 
 interface LayoutProcessorInterface
 {

@@ -1,6 +1,6 @@
 <?php
 
-namespace Framework\View\Layout;
+namespace Framework\View\Layout\Interfaces;
 
 interface LayoutInterface
 {

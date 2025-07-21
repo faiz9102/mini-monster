@@ -1,7 +1,6 @@
 <?php
 
 namespace Framework\View\Block\Helper;
-use App\ConfigProvider;
 
 /**
  * Data class for templates blocks.
@@ -9,47 +8,25 @@ use App\ConfigProvider;
  */
 class Data
 {
-
     /**
-     * Template Path Resolver
+     * Generate the path to the template file based on the template identifier.
+     * Template identifiers format : '<area>::template_file'.
      *
-     * This method can be used to resolve the path of a templates file based on a given identifier.
-     * For example, it can be used to convert a templates identifier like 'admin/index/index' into a file path like 'app.php/view/admin/index/index.phtml'.
-     * @param string $templateIdentifier The templates identifier.
-     * @return string The resolved file path.
+     * @param string $templateIdentifier
+     * @return string
      */
-    public function getTemplatePath(string $templateIdentifier): ?string
+    public static function getTemplatePath(string $templateIdentifier): string
     {
-        $templateParts = explode("::", $templateIdentifier);
+        $templateParts = explode("::", $templateIdentifier );
 
-        if (count($templateParts) < 2) {
-            throw new \RuntimeException("Invalid templates path: {$templateIdentifier}");
+        if (count($templateParts) !== 2) {
+            throw new \RuntimeException("Invalid templates identifier format: $templateIdentifier. Expected format is 'area::template_file'.");
         }
 
         $area = $templateParts[0];
         $basePath = \Framework\FileSystem\ViewFileSystem::getViewPath() . DIRECTORY_SEPARATOR . 'templates';
         $filePath = $area . DIRECTORY_SEPARATOR . $templateParts[1];
         return $basePath . DIRECTORY_SEPARATOR . $filePath;
-    }
-
-    /**
-     * Render a templates with the given data.
-     *
-     * @param string $template The path to the templates file.
-     * @param array $data The data to be passed to the templates.
-     * @return string The rendered HTML content.
-     */
-    public function renderTemplate(string $template, array $data = []): string
-    {
-        if (!file_exists($template)) {
-            return '';
-        }
-
-        ob_start();
-        extract($data);
-        require $template;
-        $output = ob_get_clean() ?: '';
-        return $this->escapeHtml($output);
     }
 
     /**

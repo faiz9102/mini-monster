@@ -2,9 +2,9 @@
 
 namespace Framework\View\Processors;
 
-use Framework\View\Processors\Interfaces\LayoutProcessorInterface;
-use Framework\View\Layout\LayoutInterface;
+use Framework\View\Layout\Interfaces\LayoutInterface;
 use Framework\View\Processors\Interfaces\ElementProcessorInterface as BlockProcessor;
+use Framework\View\Processors\Interfaces\LayoutProcessorInterface;
 
 class LayoutProcessor implements LayoutProcessorInterface
 {

@@ -2,7 +2,7 @@
 
 namespace Framework\View\Processors\Interfaces;
 
-use Framework\View\Layout\LayoutInterface;
+use Framework\View\Layout\Interfaces\LayoutInterface;
 
 interface PageProcessorInterface
 {
