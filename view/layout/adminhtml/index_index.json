@@ -1,15 +1,20 @@
 {
   "layout": {
     "version": "1.0.0",
+    "id": "adminhtml:index_index",
+    "title": "Admin Homepage",
+    "description": "Layout for the admin homepage",
+    "page": "default_login_form",
     "components": [
       {
         "name": "index.index",
         "type": "block",
-        "class": "Framework\\View\\Block\\Template\\Element",
+        "class": "Framework\\View\\Block\\Adminhtml\\Element",
         "template": "adminhtml::index/index.phtml",
         "arguments": {
           "data": {
-            "area": "adminhtml"
+            "whoami": "Faiz",
+            "name" : "Faiz"
           }
         },
         "children": []
@@ -17,17 +22,17 @@
       {
         "name": "index.index.sidebar",
         "type": "block",
-        "class": "Framework\\View\\Block\\Template\\Element",
+        "class": "Framework\\View\\Block\\Adminhtml\\Element",
         "template": "adminhtml::index/sidebar.phtml",
         "arguments": {
           "data": {
             "area": "adminhtml"
           },
-          "clildren": {
+          "children": {
             "menu": {
-              "name": "index.index.sidebar.menu",
+              "name": "index.index.sidebar.menu.heading",
               "type": "block",
-              "class": "Framework\\View\\Block\\Template\\Element",
+              "class": "Framework\\View\\Block\\Adminhtml\\Element",
               "template": "adminhtml::index/sidebar/menu.phtml",
               "arguments": {
                 "data": {
@@ -39,16 +44,16 @@
         },
         "children": [
           {
-            "name": "index.index.sidebar.menu",
+            "name": "index.index.sidebar.menu.items",
             "type": "block",
-            "class": "Framework\\View\\Block\\Template\\Element",
+            "class": "Framework\\View\\Block\\Adminhtml\\Element",
             "template": "adminhtml::index/sidebar/menu.phtml",
             "arguments": {
               "data": {
                 "area": "adminhtml"
               }
             },
-            "clildren": []
+            "children": []
           }
         ]
       }

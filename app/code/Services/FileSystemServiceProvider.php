@@ -3,11 +3,11 @@
 namespace App\Services;
 
 use App\ConfigProvider;
-use Framework\DI\ServiceProvider;
+use Framework\DI\AbstractServiceProvider;
 use Framework\FileSystem\FileSystem;
 use Framework\FileSystem\FileSystemInterface;
 
-class FileSystemServiceProvider extends ServiceProvider
+class FileSystemServiceProvider extends AbstractServiceProvider
 {
     public function register(): void
     {
@@ -15,7 +15,7 @@ class FileSystemServiceProvider extends ServiceProvider
         $this->container->bindInterface(FileSystemInterface::class, FileSystem::class);
 
         // Register FileSystem as singleton
-        $this->container->singleton(FileSystem::class, function () {
+        $this->container->bind(FileSystem::class, function () {
             return new FileSystem(ConfigProvider::getInstance());
         });
     }

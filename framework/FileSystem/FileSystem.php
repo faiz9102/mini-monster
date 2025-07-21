@@ -18,35 +18,49 @@ class FileSystem implements FileSystemInterface
      *
      * @return string
      */
-    public function getRootPath(): string
+    public static function getRootPath(): string
     {
-        $path = rtrim($this->directories['root'], '/') . '/';
-        if (!is_dir($path)) {
-            throw new \Exception("Root path does not exist: " . $path);
-        }
-        return $this->stripGoBacks($path);
+        $rootPath = ConfigProvider::getInstance()->get("directories")['root'];
+        return realpath(rtrim($rootPath, DIRECTORY_SEPARATOR));
+    }
+
+    public static function getFrameworkPath(): string
+    {
+        return self::getRootPath() . '/framework';
+    }
+
+    public static function getViewPath(): string
+    {
+        return realpath(self::getRootPath() . ConfigProvider::getInstance()->get("view", 'view'));
     }
 
     /**
-     * Strip go backs '../' from a given path and balances the path by removing the effect of '../'.
+     * Normalize a file path by removing redundant segments or unnecessary slashes and goBacks.
      */
-    public function stripGoBacks(string $path): string
+    public static function normalizePath($path) : string
     {
-        $parts = explode('/', $path);
-        $balancedParts = [];
+        $parts = []; // Array to hold the path segments
+        $path = str_replace('\\', '/', $path); // Normalize slashes
+        $segments = explode('/', $path);
 
-        foreach ($parts as $part) {
-            if ($part === '' || $part === '.') {
-                continue; // Skip empty parts and current directory references
+        foreach ($segments as $segment) {
+            if ($segment === '' || $segment === '.') {
+                continue;
             }
-            if ($part === '..') {
-                array_pop($balancedParts); // Go back one directory
+            if ($segment === '..') {
+                array_pop($parts); // Go one directory up
             } else {
-                $balancedParts[] = $part; // Add the current part
+                $parts[] = $segment;
             }
         }
 
-        return implode('/', $balancedParts);
+        $normalized = implode('/', $parts);
+        // If path starts with "/", make sure it stays absolute
+        if (str_starts_with($path, '/')) {
+            $normalized = '/' . $normalized;
+        }
+
+        return $normalized;
     }
 
     /**

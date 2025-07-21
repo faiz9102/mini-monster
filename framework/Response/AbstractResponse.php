@@ -13,12 +13,10 @@ abstract class AbstractResponse implements ResponseInterface
     protected string $body = '';
 
     public function __construct(
-        $body,
         int $responseCode = 200,
         array $headers = [],
         string $contentType = 'text/plain',
     ) {
-        $this->setBody($body);
         $this->responseCode = $responseCode;
         $this->headers = $headers;
         $this->contentType = $contentType;
@@ -113,5 +111,10 @@ abstract class AbstractResponse implements ResponseInterface
 
         // Output the body content
         echo $this->getBody();
+    }
+
+    public function clearHeaders(): void
+    {
+        header_remove();
     }
 }

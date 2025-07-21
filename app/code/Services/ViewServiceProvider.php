@@ -2,47 +2,44 @@
 
 namespace App\Services;
 
-use Framework\DI\ServiceProvider;
-use Framework\Response\Result\Page;
-use Framework\View\Block\Template\Helper as LayoutHelper;
+use Framework\DI\AbstractServiceProvider;
 use Framework\View\Layout\Layout;
 use Framework\View\Layout\LayoutInterface;
-use Framework\View\Layout\LayoutParser;
-use Framework\View\Layout\LayoutProcessor;
+use Framework\View\Processors\ElementProcessor;
+use Framework\View\Processors\Interfaces\ElementProcessorInterface;
+use Framework\View\Processors\Interfaces\LayoutProcessorInterface;
+use Framework\View\Processors\Interfaces\PageProcessorInterface;
+use Framework\View\Processors\LayoutProcessor;
+use Framework\View\Processors\PageProcessor;
 
-class ViewServiceProvider extends ServiceProvider
+class ViewServiceProvider extends AbstractServiceProvider
 {
     public function register(): void
     {
-        // Register LayoutHelper
-        $this->container->singleton(LayoutHelper::class, function () {
-            return new LayoutHelper();
-        });
+        $this->container->bindInterface(
+            ElementProcessorInterface::class,
+            ElementProcessor::class
+        );
+        $this->container->bind(
+            Layout::class,
+            function () {
+                return new Layout();
+            }
+        );
 
-        // Register LayoutParser
-        $this->container->singleton(LayoutParser::class, function () {
-            return new LayoutParser();
-        });
+        $this->container->bindInterface(
+            PageProcessorInterface::class,
+            PageProcessor::class
+        );
 
-        // Register LayoutProcessor
-        $this->container->singleton(LayoutProcessor::class, function () {
-            return new LayoutProcessor(
-                $this->container->resolve(LayoutHelper::class),
-                $this->container->resolve(LayoutParser::class)
-            );
-        });
+        $this->container->bindInterface(
+            LayoutProcessorInterface::class,
+            LayoutProcessor::class
+        );
 
-        // Register Layout - fixed to avoid circular dependency
-        $this->container->singleton(LayoutInterface::class, function () {
-            return new Layout();
-        });
-
-        // Bind interface to concrete implementation
-        $this->container->bindInterface(LayoutInterface::class, Layout::class);
-
-        // Register Page
-        $this->container->singleton(Page::class, function () {
-            return new Page($this->container->resolve(LayoutInterface::class));
-        });
+        $this->container->bindInterface(
+            LayoutInterface::class,
+            Layout::class
+        );
     }
 }

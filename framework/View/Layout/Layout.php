@@ -3,19 +3,24 @@ declare(strict_types=1);
 
 namespace Framework\View\Layout;
 
-use Framework\View\Block\Template\Element as Block;
-
 /**
  * Layout class for managing layout templates and blocks.
  */
 class Layout implements LayoutInterface
 {
     /**
-     * @var Block[] $Blocks
+     * @var array $_Blocks
      */
-    private array $Blocks = [];
+    private array $_Blocks = [];
     private string $_name;
     private string $_template;
+
+    public function __construct(string $name = '', string $template = '', array $blocks = [])
+    {
+        $this->_name = $name;
+        $this->_template = $template;
+        $this->_Blocks = $blocks;
+    }
 
     public function getName(): string
     {
@@ -40,40 +45,38 @@ class Layout implements LayoutInterface
 
     public function getBlocks(): array
     {
-        return $this->Blocks;
-    }
-
-    public function getTemplatePath(): string
-    {
-        // TODO : implement layout file mapping logic
-        return '';
+        return $this->_Blocks;
     }
 
     /**
-     * Render the layout with all blocks
-     *
-     * @return string
+     * @inheritDoc
      */
-    public function render(): string
+    public function removeBlock(string $blockName): LayoutInterface
     {
-        // Basic implementation - can be expanded as needed
-        $output = '';
-
-        // You might want to load the template file here and process it
-        $templatePath = $this->getTemplatePath();
-        if (file_exists($templatePath)) {
-            ob_start();
-            include $templatePath;
-            $output = ob_get_clean();
-        }
-
-        // If no template or template doesn't exist, render blocks directly
-        if (empty($output)) {
-            foreach ($this->Blocks as $block) {
-                $output .= $block->toHtml();
+        foreach ($this->_Blocks as $key => $block) {
+            if ($block['name'] === $blockName) {
+                unset($this->_Blocks[$key]);
+                break;
             }
         }
+        return $this;
+    }
 
-        return $output;
+    /**
+     * @inheritDoc
+     */
+    public function addBlock(array $block): LayoutInterface
+    {
+        $this->_Blocks[$block['name']] = $block;
+        return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setBlocks(array $blocks): LayoutInterface
+    {
+        $this->_Blocks = $blocks;
+        return $this;
     }
 }

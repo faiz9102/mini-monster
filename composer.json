@@ -1,6 +1,6 @@
 {
-    "name": "faiz/lms-portal",
-    "description": "A basic LMS portal for managing students and instructors",
+    "name": "project/mini-monster",
+    "description": "A basic framework for building PHP web applications.",
     "type": "project",
     "license": "MIT",
     "autoload": {
@@ -15,6 +15,8 @@
         }
     ],
     "require": {
-        "monolog/monolog": "^3.9"
+        "monolog/monolog": "^3.9",
+        "opis/json-schema": "^2.4",
+        "ext-mbstring": "*"
     }
 }

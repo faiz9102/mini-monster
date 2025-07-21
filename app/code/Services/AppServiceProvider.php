@@ -2,28 +2,46 @@
 
 namespace App\Services;
 
+use Framework\DI\AbstractServiceProvider;
 use App\Application;
-use Framework\DI\ServiceProvider;
 use Psr\Log\LoggerInterface;
+use Framework\Response\ResponseInterface;
+use Framework\Response\Result\Page;
+use Framework\Logger\Logger;
+use App\ConfigProvider;
 
-class AppServiceProvider extends ServiceProvider
+class AppServiceProvider extends AbstractServiceProvider
 {
     public function register(): void
     {
-        // Register Application as singleton with logger injection
-        $this->container->singleton(Application::class, function () {
-            $application = new Application($this->container);
+        $this-> container->bindInterface(
+            ResponseInterface::class,
+            Page::class
+        );
 
-            // If Logger is available, inject it into Application
-            if (class_exists('Psr\Log\LoggerInterface') && isset($this->container->bindings[LoggerInterface::class])) {
-                $logger = $this->container->resolve(LoggerInterface::class);
-                // You'll need to add a setLogger method to Application class
-                if (method_exists($application, 'setLogger')) {
-                    $application->setLogger($logger);
-                }
+        $this->container->bind(
+            ConfigProvider::class, function () {
+                return ConfigProvider::getInstance();
             }
+        );
 
-            return $application;
+        $this->container->bind(Application::class, function () {
+            return new Application(
+                $this->container,
+                $this->container->get(LoggerInterface::class)
+            );
         });
+
+        $this->container->bindSingleton(
+            ConfigProvider::class,
+            function () {
+                return ConfigProvider::getInstance();
+            }
+        );
+    }
+
+    public function boot(): void
+    {
+        $this->container->get(\Framework\App\RequestContext::class);
     }
 }

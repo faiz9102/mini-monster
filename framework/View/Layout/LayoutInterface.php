@@ -2,8 +2,6 @@
 
 namespace Framework\View\Layout;
 
-use Framework\View\Block\Template\Element as Block;
-
 interface LayoutInterface
 {
     /**
@@ -22,14 +20,14 @@ interface LayoutInterface
     public function setName(string $name): self;
 
     /**
-     * Get the template of the layout.
+     * Get the templates of the layout.
      *
      * @return string
      */
     public function getTemplate(): string;
 
     /**
-     * Set the template of the layout.
+     * Set the templates of the layout.
      *
      * @param string $template
      * @return self
@@ -39,14 +37,25 @@ interface LayoutInterface
     /**
      * Get all blocks in the layout.
      *
-     * @return Block[]
+     * @return array
      */
     public function getBlocks(): array;
 
     /**
-     * Get the path to the template file for this layout.
-     *
-     * @return string
+     * @param array $blocks
+     * @return self
      */
-    public function getTemplatePath(): string;
+    public function setBlocks(array $blocks): self;
+
+    /**
+     * @param array $block
+     * @return self
+     */
+    public function addBlock(array $block): self;
+
+    /**
+     * @param string $blockName
+     * @return self
+     */
+    public function removeBlock(string $blockName): self;
 }

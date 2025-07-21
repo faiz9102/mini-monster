@@ -13,10 +13,16 @@ class Json extends AbstractResponse
         int $statusCode = 200,
         array $headers = []
     ) {
-        parent::__construct($data, $statusCode, $headers, self::CONTENT_TYPE, $body);
+        parent::__construct('',$statusCode, $data, $headers, self::CONTENT_TYPE);
     }
 
-    public function validateBodyContent(string $content): bool
+    public function setData(string $data): self
+    {
+        $this->setBody(json_encode($data, JSON_THROW_ON_ERROR));
+        return $this;
+    }
+
+    protected function validateBodyContent(string $content): bool
     {
         if (function_exists('json_validate')) {
             return json_validate($content);

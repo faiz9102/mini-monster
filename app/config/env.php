@@ -6,7 +6,7 @@ return [
         'frontName' => 'admin785'
     ],
     'directories' => [
-        'root' => __DIR__ . '/../../',
+        'root' => __DIR__ . '/../..',
         'static' => 'static',
         'view' => 'view' ,
         'media' => 'media',

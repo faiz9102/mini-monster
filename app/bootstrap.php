@@ -1,11 +1,9 @@
 <?php
 declare(strict_types=1);
 
-use App\Services\AppServiceProvider;
-use App\Services\FileSystemServiceProvider;
-use App\Services\LogServiceProvider;
-use App\Services\ViewServiceProvider;
 use Framework\DI\Container;
+
+$initParams = $_SERVER;
 
 $container = Container::getInstance();
 
@@ -16,12 +14,14 @@ $container->bind('config', function () {
 });
 
 // Register service providers
-$container->registerProvider(LogServiceProvider::class);
-$container->registerProvider(FileSystemServiceProvider::class);
-$container->registerProvider(ViewServiceProvider::class);
-$container->registerProvider(AppServiceProvider::class);
+//$container->registerProvider(LogServiceProvider::class);
+//$container->registerProvider(FileSystemServiceProvider::class);
+//$container->registerProvider(SchemaServiceProvider::class);
+//$container->registerProvider(ViewServiceProvider::class);
+//$container->registerProvider(AppAbstractServiceProvider::class);
 
-// You can still scan and auto-register additional services if needed
-// $container->scanAndRegister(__DIR__ . '/Services', 'App\\Services');
+$serviceProviderDirectory = __DIR__ . '/code/Services';
+
+$container->findAndLoadServiceProviders($serviceProviderDirectory);
 
 return $container;

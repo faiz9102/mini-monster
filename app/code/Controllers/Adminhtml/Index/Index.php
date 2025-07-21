@@ -23,6 +23,6 @@ class Index extends AbstractAction
     public function execute() : ResponseInterface
     {
         // Render the admin index page
-        return $this->response->setStatusCode()->setBody("");
+        return $this->response;
     }
 }
