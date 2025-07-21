@@ -85,6 +85,12 @@ class Container implements ContainerInterface
             return self::getInstance();
         }
 
+        // Prevents ServiceProvider from being multiple times
+        if (array_key_exists($type, $this->serviceProviders))
+        {
+            return $this->serviceProviders[$type];
+        }
+
         // Use explicit binding if available
         if (isset($this->bindings[$type])) {
             return call_user_func($this->bindings[$type], $args);
