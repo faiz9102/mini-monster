@@ -5,10 +5,12 @@ date_default_timezone_set('UTC');
 ini_set('precision', 14);
 ini_set('serialize_precision', 14);
 
+define('BP', realpath(__DIR__ . '/..'));
+
 require __DIR__ . '/../vendor/autoload.php';
 
 use Framework\App\Bootstrap;
-use App\Application;
+use Framework\Application;
 
 /**
  * Bootstrap the application using Magento-like class-based bootstrapping.
@@ -21,7 +23,7 @@ use App\Application;
  * @license MIT
  */
 
-$rootDir = realpath(__DIR__ . '/..');
+$rootDir = BP;
 $initParams = $_SERVER;
 
 // Create Bootstrap instance
