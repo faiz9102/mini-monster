@@ -22,10 +22,11 @@ class ElementProcessor implements ElementProcessorInterface
      */
     public function process(array $element): string
     {
+        $childData = [];
+
         if (!empty($element['children'])) {
-            $childrenOutput = '';
             foreach ($element['children'] as $child) {
-                $childrenOutput .= $this->process($child);
+                $childData[$child['name']] .= $this->process($child);
             }
 
             $block = $this->container->create($element['blockClass'], [
@@ -35,7 +36,13 @@ class ElementProcessor implements ElementProcessorInterface
                 'children' => $element['children'],
             ]);
 
-            return $block->_toHtml();
+            $elementOutput = $block->_toHtml();
+
+            foreach ($childData as $name => $data) {
+                $elementOutput = str_replace('<!--' . $name . '-->', $data, $elementOutput);
+            }
+
+            return $elementOutput;
         }
 
         $block = $this->container->create($element['blockClass'], [
@@ -45,16 +52,5 @@ class ElementProcessor implements ElementProcessorInterface
         ]);
 
         return $block->_toHtml();
-    }
-
-
-    /**
-     * @inheritDoc
-     */
-    public function renderBlock(BlockElementInterface $block, $config): void
-    {
-        if ($block->getTemplate()) {
-            $block->setTemplate($config['template'] ?? $block->getTemplate());
-        }
     }
 }

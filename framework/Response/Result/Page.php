@@ -77,7 +77,7 @@ class Page extends AbstractResponse
         // Base layout area
         $layoutName = $this->requestContext->isAdmin() ? 'adminhtml' : 'frontend';
 
-        $layoutName .= PATH_SEPARATOR;
+        $layoutName .= ':';
 
         // Get admin front name from config
         $backend = $this->config->get('backend', []);
@@ -90,7 +90,7 @@ class Page extends AbstractResponse
         $uri = parse_url($uri, PHP_URL_PATH);
 
         // Normalize the URI by trimming admin path
-        if (!empty($adminIdentifier) && str_starts_with($uri, '/' . $adminIdentifier)) {
+        if(!empty($adminIdentifier) && str_starts_with($uri, '/' . $adminIdentifier)) {
             $uri = substr($uri, strlen('/' . $adminIdentifier));
         }
 
@@ -100,7 +100,7 @@ class Page extends AbstractResponse
         $requestParts = explode('/', $uri);
 
         // Ensure at least controller + action
-        if (count($requestParts) < 2) {
+        if(count($requestParts) < 2) {
             if($requestParts[0] === '')
                 $requestParts[0] = 'index';
             $requestParts = array_pad($requestParts, 2, 'index');

@@ -20,14 +20,14 @@ interface LayoutInterface
     public function setName(string $name): self;
 
     /**
-     * Get the template of the layout.
+     * Get the templates of the layout.
      *
      * @return string
      */
     public function getTemplate(): string;
 
     /**
-     * Set the template of the layout.
+     * Set the templates of the layout.
      *
      * @param string $template
      * @return self

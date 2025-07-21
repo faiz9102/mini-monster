@@ -20,14 +20,14 @@ interface BlockElementInterface
     public function setChildren(array $children): self;
 
     /**
-     * Get the template associated with the block element.
+     * Get the templates associated with the block element.
      *
      * @return string|null
      */
     public function getTemplate(): ?string;
 
     /**
-     * Set the template for the block element.
+     * Set the templates for the block element.
      *
      * @param string|null $template
      * @return self

@@ -184,7 +184,7 @@ class PageProcessor implements PageProcessorInterface
 
     public static function getLayoutInfo(string $layoutName): array
     {
-        $parts = explode(PATH_SEPARATOR, $layoutName);
+        $parts = explode(':', $layoutName);
         $partsCount = count($parts);
 
         if ($partsCount < 1 || $partsCount > 2) {

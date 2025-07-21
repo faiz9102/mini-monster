@@ -4,7 +4,7 @@
     "id": "adminhtml:index_index",
     "title": "Admin Homepage",
     "description": "Layout for the admin homepage",
-    "page": "deafault_login_form",
+    "page": "default_login_form",
     "components": [
       {
         "name": "index.index",

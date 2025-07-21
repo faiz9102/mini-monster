@@ -24,7 +24,7 @@ class Logger extends MonologLogger implements LoggerInterface
                 if (!is_dir($logDir)) {
                     mkdir($logDir, 0755, true);
                 }
-                error_log("Warning: error occured in creating the var/log directory" . $e->getMessage());
+                error_log("Warning: error occurred in creating the var/log directory" . $e->getMessage());
             }
         }
 

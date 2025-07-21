@@ -4,7 +4,7 @@ namespace Framework\View\Block\Helper;
 use App\ConfigProvider;
 
 /**
- * Data class for template blocks.
+ * Data class for templates blocks.
  * This class can be extended to provide additional helper methods for templates.
  */
 class Data
@@ -15,20 +15,20 @@ class Data
         $templateParts = explode("::", $templateIdentifier);
 
         if (count($templateParts) < 2) {
-            throw new \RuntimeException("Invalid template path: {$this->template}");
+            throw new \RuntimeException("Invalid templates path: {$templateIdentifier}");
         }
 
         $area = $templateParts[0];
-        $basePath = \Framework\FileSystem\ViewFileSystem::getViewPath() . DIRECTORY_SEPARATOR . 'template';
+        $basePath = \Framework\FileSystem\ViewFileSystem::getViewPath() . DIRECTORY_SEPARATOR . 'templates';
         $filePath = $area . DIRECTORY_SEPARATOR . $templateParts[1];
         return $basePath . DIRECTORY_SEPARATOR . $filePath;
     }
 
     /**
-     * Render a template with the given data.
+     * Render a templates with the given data.
      *
-     * @param string $template The path to the template file.
-     * @param array $data The data to be passed to the template.
+     * @param string $template The path to the templates file.
+     * @param array $data The data to be passed to the templates.
      * @return string The rendered HTML content.
      */
     public function renderTemplate(string $template, array $data = []): string
@@ -69,9 +69,9 @@ class Data
     /**
      * Template Path Resolver
      *
-     * This method can be used to resolve the path of a template file based on a given identifier.
-     * For example, it can be used to convert a template identifier like 'admin/index/index' into a file path like 'app.php/view/admin/index/index.phtml'.
-     * @param string $identifier The template identifier.
+     * This method can be used to resolve the path of a templates file based on a given identifier.
+     * For example, it can be used to convert a templates identifier like 'admin/index/index' into a file path like 'app.php/view/admin/index/index.phtml'.
+     * @param string $identifier The templates identifier.
      * @return string The resolved file path.
      */
     public function getTemplatePath(string $identifier = 'default'): string

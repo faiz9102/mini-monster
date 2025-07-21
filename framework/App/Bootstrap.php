@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Framework\App;
 
 use Framework\DI\Container;
+use JetBrains\PhpStorm\NoReturn;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -191,19 +192,19 @@ class Bootstrap
      *
      * @return bool
      */
-    public function isDeveloperMode()
+    public function isDeveloperMode() : bool
     {
         return false;
     }
 
-    private static function handleGlobalException(): void
+    private function handleGlobalException(): void
     {
         register_shutdown_function(function () {
             $error = error_get_last();
             if ($error === null)
                 return;
             else
-                $this->terminate(
+                self::terminateStatic(
                     new \ErrorException(
                         $error['message'],
                         0,
@@ -219,6 +220,17 @@ class Bootstrap
     {
         // Always use fallback approach for better reliability
         $this->handleTerminationFallback($e);
+    }
+
+    #[NoReturn] private static function terminateStatic(\Throwable $e): void
+    {
+        // Fallback termination logic for static context
+        http_response_code(500);
+        header('Content-Type: text/html; charset=utf-8');
+        // Simplified error response for static context
+        echo '<h1>An error occurred</h1>';
+        echo '<p>' . htmlspecialchars($e->getMessage(), ENT_QUOTES, 'UTF-8') . '</p>';
+        exit(1);
     }
 
     /**

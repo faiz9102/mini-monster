@@ -78,6 +78,7 @@ class Element implements BlockElementInterface
         }
 
         extract($this->data); // make $data['foo'] become $foo
+        $block = $this;
 
         ob_start();
         include $templateFile;
@@ -89,11 +90,11 @@ class Element implements BlockElementInterface
         $templateParts = explode("::", $templateIdentifier ?: $this->template);
 
         if (count($templateParts) < 2) {
-            throw new \RuntimeException("Invalid template path: {$this->template}");
+            throw new \RuntimeException("Invalid templates path: {$this->template}");
         }
 
         $area = $templateParts[0];
-        $basePath = \Framework\FileSystem\ViewFileSystem::getViewPath() . DIRECTORY_SEPARATOR . 'template';
+        $basePath = \Framework\FileSystem\ViewFileSystem::getViewPath() . DIRECTORY_SEPARATOR . 'templates';
         $filePath = $area . DIRECTORY_SEPARATOR . $templateParts[1];
         return $basePath . DIRECTORY_SEPARATOR . $filePath;
     }

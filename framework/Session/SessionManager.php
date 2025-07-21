@@ -1,5 +1,7 @@
 <?php
 
+namespace Framework\Session;
+
 class SessionManager implements SessionManagerInterface
 {
     private array $sessionData = [];
