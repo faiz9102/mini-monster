@@ -17,6 +17,7 @@
     "require": {
         "monolog/monolog": "^3.9",
         "opis/json-schema": "^2.4",
-        "ext-mbstring": "*"
+        "ext-mbstring": "*",
+        "ext-readline": "*"
     }
 }
