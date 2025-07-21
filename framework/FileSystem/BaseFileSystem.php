@@ -3,16 +3,14 @@
 namespace Framework\FileSystem;
 
 use Framework\ConfigProvider;
-use Framework\FileSystem\Interfaces\FileSystemInterface;
+use Framework\FileSystem\Interfaces\BaseFileSystemInterface;
 
-class FileSystem implements FileSystemInterface
+class BaseFileSystem implements BaseFileSystemInterface
 {
-    private readonly string $rootPath;
     protected array $directories = [];
 
-    public function __construct(string $rootPath = __DIR__ . '/../../')
+    public function __construct()
     {
-        $this->rootPath = rtrim($rootPath, DIRECTORY_SEPARATOR);
         $this->directories = ConfigProvider::getInstance()->get("directories");
     }
 

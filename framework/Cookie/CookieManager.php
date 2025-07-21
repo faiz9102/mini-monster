@@ -2,6 +2,8 @@
 
 namespace Framework\Cookie;
 
+use Framework\Cookie\Interfaces\CookieManagerInterface;
+
 class CookieManager implements CookieManagerInterface
 {
     public const DEFAULT_PATH = '/';

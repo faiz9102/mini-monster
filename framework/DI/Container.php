@@ -3,12 +3,16 @@
 namespace Framework\DI;
 
 use Framework\DI\Interfaces\ContainerInterface;
+use Framework\DI\Interfaces\ServiceProviderInterface;
 
 class Container implements ContainerInterface
 {
     protected static ?Container $instance = null;
+
+    private static bool $isContainerBooted = false;
     protected array $bindings = [];
     protected array $instances = [];
+    private array $serviceProviders = [];
 
     private function __construct()
     {
@@ -215,27 +219,31 @@ class Container implements ContainerInterface
             throw new \RuntimeException("Service provider class {$class} does not exist.");
         }
 
-        if (!is_subclass_of($class, AbstractServiceProvider::class)) {
-            throw new \RuntimeException("Service provider {$class} must extend " . AbstractServiceProvider::class);
+        if (!in_array(ServiceProviderInterface::class, class_implements($class))) {
+            throw new \RuntimeException("Service provider {$class} must implement " . ServiceProviderInterface::class);
         }
 
-        /** @var \Framework\DI\AbstractServiceProvider $provider */
+        /** @var ServiceProviderInterface $provider */
         $provider = $this->get($class);
 
-        if (!method_exists($provider, 'register')) {
-            throw new \RuntimeException("Service provider {$class} must implement a register method.");
-        }
-
         $provider->register();
+        $this->serviceProviders[$class] = $provider;
     }
 
-    public function findAndLoadServiceProviders(string $directory = __DIR__ . "/../../app/code/Services"): void
+    /**
+     *
+     *
+     * @param string $directory
+     * @param string $nameSpace
+     * @return void
+     */
+    public function findAndLoadServiceProviders(string $directory, string $nameSpace): void
     {
         if (!is_dir($directory)) {
             throw new \RuntimeException("Directory {$directory} does not exist.");
         }
 
-        $files = glob($directory . DIRECTORY_SEPARATOR . '*ServiceProvider.php');
+        $files = glob($directory . DIRECTORY_SEPARATOR . '*ServiceProvider.php',GLOB_NOSORT);
 
         foreach ($files as $index => $file) {
             $files[$index] = realpath($file);
@@ -245,7 +253,7 @@ class Container implements ContainerInterface
 
         foreach ($files as $index => $filePath) {
             require_once $filePath;
-            $className[$index] = "App\\Services\\" . pathinfo($filePath, PATHINFO_FILENAME);
+            $className[$index] = "{$nameSpace}\\" . pathinfo($filePath, PATHINFO_FILENAME);
             $this->registerProvider($className[$index]);
         }
 
@@ -255,8 +263,26 @@ class Container implements ContainerInterface
              * @var \Framework\DI\AbstractServiceProvider $instance
              */
             $instance = $this->get($class);
-            $instance->boot();
+            $this->serviceProviders[$class] = $instance;
         }
 
+    }
+
+    /**
+     * Boots the container by calling the boot method
+     * of each registered service provider.
+     *
+     * @return void
+     */
+    public function bootContainer(): void
+    {
+        if (self::$isContainerBooted) {
+            return;
+        }
+
+        foreach ($this->serviceProviders as $serviceProvider) {
+            $serviceProvider->boot();
+        }
+        self::$isContainerBooted = true;
     }
 }

@@ -1,9 +1,9 @@
 <?php
 declare(strict_types=1);
 
-namespace Framework\Controllers;
+namespace Framework\Controllers\Interfaces;
 
-use Framework\Response\ResponseInterface;
+use Framework\Response\Interfaces\ResponseInterface;
 
 interface ActionInterface
 {

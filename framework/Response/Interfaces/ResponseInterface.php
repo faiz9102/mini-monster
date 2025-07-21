@@ -1,6 +1,6 @@
 <?php
 
-namespace Framework\Response;
+namespace Framework\Response\Interfaces;
 
 interface ResponseInterface
 {
@@ -8,7 +8,7 @@ interface ResponseInterface
      * Set the HTTP status code for the response.
      *
      * @param int $code
-     * @return void
+     * @return self
      */
     public function setStatusCode(int $code): self;
 
@@ -17,7 +17,7 @@ interface ResponseInterface
      *
      * @param string $name
      * @param string $value
-     * @return void
+     * @return self
      */
     public function setHeader(string $name, string $value): self;
 
@@ -25,7 +25,7 @@ interface ResponseInterface
      * Set multiple headers for the response.
      *
      * @param array $headers
-     * @return void
+     * @return self
      */
 
     public function setHeaders(array $headers): self;
@@ -34,7 +34,7 @@ interface ResponseInterface
      * set the content type for the response.
      *
      * @param string $contentType
-     * @return void
+     * @return self
      */
 
     public function setContentType(string $contentType): self;
@@ -43,7 +43,7 @@ interface ResponseInterface
      * Set the body content for the response.
      *
      * @param string $content
-     * @return void
+     * @return self
      */
 
     public function setBody(string $content): self;

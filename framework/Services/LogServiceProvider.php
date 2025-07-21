@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Services;
+namespace Framework\Services;
 
 use Framework\DI\AbstractServiceProvider;
-use Monolog\Handler\RotatingFileHandler;
-use Framework\Logger\Logger;
 use Framework\Logger\Interfaces\LoggerInterface;
+use Framework\Logger\Logger;
+use Monolog\Handler\RotatingFileHandler;
 
 class LogServiceProvider extends AbstractServiceProvider
 {

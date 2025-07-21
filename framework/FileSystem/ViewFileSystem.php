@@ -5,7 +5,7 @@ namespace Framework\FileSystem;
 use Framework\ConfigProvider;
 use Framework\FileSystem\Interfaces\ViewFileSystemInterface;
 
-class ViewFileSystem extends FileSystem implements ViewFileSystemInterface
+class ViewFileSystem extends BaseFileSystem implements ViewFileSystemInterface
 {
     /**
      * Get the base view path

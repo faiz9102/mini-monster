@@ -3,10 +3,10 @@ declare(strict_types=1);
 
 namespace Framework\Response\Result;
 
-use App\ConfigProvider;
 use Framework\App\RequestContext;
+use Framework\ConfigProvider;
 use Framework\Response\AbstractResponse;
-use Framework\View\Layout\LayoutInterface;
+use Framework\View\Layout\Interfaces\LayoutInterface;
 use Framework\View\Processors\Interfaces\PageProcessorInterface;
 
 class Page extends AbstractResponse

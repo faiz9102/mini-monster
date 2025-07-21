@@ -1,14 +1,15 @@
 <?php
-namespace App;
+namespace Framework;
 
 class ConfigProvider
 {
+    const string CONFIG_FILE_PATH = BP . '/app/config/env.php';
     private static ?self $instance = null;
     private array $config;
 
     private function __construct()
     {
-        $this->config = require __DIR__ . '/../config/env.php';
+        $this->config = require self::CONFIG_FILE_PATH;
     }
 
     /**
@@ -28,24 +29,5 @@ class ConfigProvider
             self::$instance = new self();
         }
         return $this->config[$key] ?? $default;
-    }
-
-    public function set(string $key, mixed $value): self
-    {
-        if (self::$instance === null) {
-            self::$instance = new self();
-        }
-        if(!array_key_exists($key, $this->config)) {
-            $this->config[$key] = $value;
-            return $this;
-        }
-        throw new \InvalidArgumentException("Key '$key' already exists in the configuration.");
-    }
-
-
-    // TODO: remove this getViewDir method in the future and  use it's implementation from FileSystem class
-    public static function getViewDir(): string
-    {
-        return self::getInstance()->get('view', 'view');
     }
 }

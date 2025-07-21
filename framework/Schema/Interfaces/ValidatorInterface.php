@@ -4,11 +4,11 @@ namespace Framework\Schema\Interfaces;
 interface ValidatorInterface
 {
     /**
-     * Validate the given data against the schema.
+     * Validates the given data against the provided schema.
      *
      * @param mixed $data The data to validate.
-     * @param string $schema The schema to validate against.
-     * @return bool True if valid, false otherwise.
+     * @param string $schemaId The schema to validate against.
+     * @return bool True if validation passes, false otherwise.
      */
-    public function isValid(mixed $data,string $schemaName): bool;
+    public function isValid(string $data,string $schemaId): bool;
 }

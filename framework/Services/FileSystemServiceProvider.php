@@ -1,8 +1,7 @@
 <?php
 
-namespace App\Services;
+namespace Framework\Services;
 
-use Framework\ConfigProvider;
 use Framework\DI\AbstractServiceProvider;
 use Framework\FileSystem\BaseFileSystem;
 use Framework\FileSystem\Interfaces\BaseFileSystemInterface;

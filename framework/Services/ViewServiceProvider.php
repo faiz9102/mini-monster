@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services;
+namespace Framework\Services;
 
 use Framework\DI\AbstractServiceProvider;
 use Framework\View\Layout\Interfaces\LayoutInterface;

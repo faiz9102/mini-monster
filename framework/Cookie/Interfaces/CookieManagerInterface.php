@@ -1,6 +1,6 @@
 <?php
 
-namespace Framework\Cookie;
+namespace Framework\Cookie\Interfaces;
 interface CookieManagerInterface
 {
     /**

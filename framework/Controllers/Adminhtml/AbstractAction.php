@@ -2,9 +2,9 @@
 
 namespace Framework\Controllers\Adminhtml;
 
-use Framework\Controllers\ActionInterface as BaseActionInterface;
 use Framework\Controllers\AbstractAction as BaseAbstractAction;
-use Framework\Response\ResponseInterface;
+use Framework\Controllers\Interfaces\ActionInterface as BaseActionInterface;
+use Framework\Response\Interfaces\ResponseInterface;
 
 abstract class AbstractAction extends BaseAbstractAction implements BaseActionInterface
 {

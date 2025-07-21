@@ -5,8 +5,9 @@ namespace Framework\Schema;
 use Framework\Schema\Helper\Data;
 use Framework\Schema\Helper\Data as SchemaHelper;
 use Framework\Utils\Json\Serializer;
+use Framework\Schema\Interfaces\SchemaFacadeInterface;
 
-class SchemaFacade
+class SchemaFacade implements SchemaFacadeInterface
 {
     /**
      * @var string
@@ -46,6 +47,9 @@ class SchemaFacade
         return $this->validator;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function loadFrameworkSchema(): void
     {
         $schemas = Data::discoverSchemaFromFrameworkDir();
@@ -59,7 +63,10 @@ class SchemaFacade
         }
     }
 
-    public function validate(string $filePath, string $schemaId): bool
+    /**
+     * @inheritDoc
+     */
+    public function validate(string $filePath, string $schemaName): bool
     {
         $fileContent = file_get_contents($filePath);
         $fileContent = json_decode($fileContent, false);
@@ -68,19 +75,25 @@ class SchemaFacade
         return $result->isValid();
     }
 
-    public function validateAndReturnContent(string $filePath, string $schemaId): array
+    /**
+     * @inheritDoc
+     */
+    public function validateAndReturnContent(string $filePath, string $schemaName): array
     {
         $fileContent = file_get_contents($filePath);
         $fileContent = json_decode($fileContent, false);
-        $result = $this->validator->validate($fileContent, self::SCHEMA_ID_PREFIX . $schemaId);
+        $result = $this->validator->validate($fileContent, self::SCHEMA_ID_PREFIX . $schemaName);
 
         if ($result->isValid()) {
             return (array)$fileContent;
         }
 
-        throw new \Exception("Validation failed for schema ID: {$schemaId} | File: {$filePath}");
+        throw new \Exception("Validation failed for schema ID: {$schemaName} | File: {$filePath}");
     }
 
+    /**
+     * @inheritDoc
+     */
     public function registerSchema(string $schemaName, string $schemaFile): void
     {
         if (!file_exists($schemaFile)) {

@@ -2,7 +2,7 @@
 
 namespace Framework\Schema\Helper;
 
-use Framework\FileSystem\FileSystem;
+use Framework\FileSystem\BaseFileSystem;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 
@@ -12,7 +12,7 @@ class Data
 
     public static function getFrameworkDirectory(): string
     {
-        return FileSystem::getRootPath() . '/framework';
+        return BaseFileSystem::getRootPath() . '/framework';
     }
 
     /**

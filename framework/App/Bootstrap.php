@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace Framework\App;
 
+use Framework\App\Interfaces\AppInterface;
 use Framework\DI\Container;
 use JetBrains\PhpStorm\NoReturn;
-use Psr\Log\LoggerInterface;
+use Framework\Logger\Interfaces\LoggerInterface;
 
 /**
  * A bootstrap of application

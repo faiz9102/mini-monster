@@ -8,15 +8,11 @@ use Opis\JsonSchema\CompliantValidator;
 class Validator extends CompliantValidator implements ValidatorInterface
 {
     /**
-     * Validates the given data against the provided schema.
-     *
-     * @param mixed $data The data to validate.
-     * @param string $schema The schema to validate against.
-     * @return bool True if validation passes, false otherwise.
+     * @inheritDoc
      */
-    public function isValid(mixed $data,string $schema): bool
+    public function isValid(string $data,string $schemaId): bool
     {
-        $result = parent::validate($data, $schema);
+        $result = parent::validate($data, $schemaId);
         return $result->isValid();
     }
 }

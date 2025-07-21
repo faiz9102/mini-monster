@@ -1,17 +1,10 @@
 <?php
 
-namespace Framework\App;
+namespace Framework\App\Interfaces;
 
 use Framework\App;
-use Framework\Response\ResponseInterface;
+use Framework\Response\Interfaces\ResponseInterface;
 
-/**
- * Different magento entry points call corresponding applications after platform is bootstrapped.
- * index.php in webroot calls HTTP application (implementation of this interface) as it is responsible for web requests.
- * cron.php entry point calls cron application
- * Implementations of this interface should implement application type specific initialization.
- *
- */
 interface AppInterface
 {
     /**
@@ -37,5 +30,5 @@ interface AppInterface
      * @param \Exception $exception
      * @return bool
      */
-    public function catchException(App\Bootstrap $bootstrap, \Exception $exception);
+    public function catchException(App\Bootstrap $bootstrap, \Exception $exception) : bool;
 }

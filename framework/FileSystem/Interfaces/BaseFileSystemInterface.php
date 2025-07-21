@@ -2,7 +2,7 @@
 
 namespace Framework\FileSystem\Interfaces;
 
-interface FileSystemInterface
+interface BaseFileSystemInterface
 {
     public static function getRootPath(): string;
 }

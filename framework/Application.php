@@ -1,11 +1,10 @@
 <?php
 
-namespace App;
+namespace Framework;
 
 use Framework\App\Bootstrap;
 use Framework\App\Interfaces\AppInterface;
 use Framework\App\RequestContext;
-use Framework\ConfigProvider;
 use Framework\DI\Container;
 use Framework\Logger\Interfaces\LoggerInterface;
 use Framework\Response\Interfaces\ResponseInterface;

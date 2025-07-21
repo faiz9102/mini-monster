@@ -3,9 +3,9 @@ declare(strict_types=1);
 
 namespace Framework\Controllers;
 
-use Framework\Controllers\ActionInterface as BaseActionInterface;
+use Framework\Controllers\Interfaces\ActionInterface as BaseActionInterface;
 use Framework\DI\DataInjectable;
-use Framework\Response\ResponseInterface;
+use Framework\Response\Interfaces\ResponseInterface;
 
 abstract class AbstractAction implements BaseActionInterface
 {

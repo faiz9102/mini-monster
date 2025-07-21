@@ -2,7 +2,7 @@
 
 namespace Framework\Response;
 
-use Framework\Response\ResponseInterface;
+use Framework\Response\Interfaces\ResponseInterface;
 
 abstract class AbstractResponse implements ResponseInterface
 {

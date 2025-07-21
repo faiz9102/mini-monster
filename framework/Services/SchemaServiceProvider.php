@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Services;
+namespace Framework\Services;
 
 use Framework\DI\AbstractServiceProvider;
-use Framework\Schema\SchemaFacade;
-use Framework\Schema\Validator;
+use Framework\Schema\Helper\Data as SchemaHelper;
 use Framework\Schema\Loader;
 use Framework\Schema\Resolver;
-use Framework\Schema\Helper\Data as SchemaHelper;
+use Framework\Schema\SchemaFacade;
+use Framework\Schema\Validator;
 
 class SchemaServiceProvider extends AbstractServiceProvider
 {

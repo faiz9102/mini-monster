@@ -5,7 +5,7 @@ namespace Framework\Logger;
 use Monolog\Logger as MonologLogger;
 use Monolog\Handler\StreamHandler;
 use Monolog\Level;
-use Psr\Log\LoggerInterface;
+use Framework\Logger\Interfaces\LoggerInterface;
 
 class Logger extends MonologLogger implements LoggerInterface
 {
@@ -14,7 +14,7 @@ class Logger extends MonologLogger implements LoggerInterface
         parent::__construct($name);
 
         // Try to create log file handler, fallback to stdout only
-        $logDir = __DIR__ . '/../../var/log';
+        $logDir = \Framework\FileSystem\BaseFileSystem::getRootPath() . '/var/log';
         if (!is_dir($logDir)) {
             try {
                 mkdir($logDir, 0755, true);
@@ -51,7 +51,7 @@ class Logger extends MonologLogger implements LoggerInterface
         ]);
     }
 
-    public function logQuery(string $sql, array $bindings = [], ?float $time): void
+    public function logQuery(string $sql, ?float $time, array $bindings = []): void
     {
         $this->debug('Database Query', [
             'sql' => $sql,
