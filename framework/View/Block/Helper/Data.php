@@ -10,6 +10,14 @@ use App\ConfigProvider;
 class Data
 {
 
+    /**
+     * Template Path Resolver
+     *
+     * This method can be used to resolve the path of a templates file based on a given identifier.
+     * For example, it can be used to convert a templates identifier like 'admin/index/index' into a file path like 'app.php/view/admin/index/index.phtml'.
+     * @param string $templateIdentifier The templates identifier.
+     * @return string The resolved file path.
+     */
     public function getTemplatePath(string $templateIdentifier): ?string
     {
         $templateParts = explode("::", $templateIdentifier);
@@ -64,23 +72,5 @@ class Data
     public function escapeUrl(string $url): string
     {
         return htmlspecialchars($url, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
-    }
-
-    /**
-     * Template Path Resolver
-     *
-     * This method can be used to resolve the path of a templates file based on a given identifier.
-     * For example, it can be used to convert a templates identifier like 'admin/index/index' into a file path like 'app.php/view/admin/index/index.phtml'.
-     * @param string $identifier The templates identifier.
-     * @return string The resolved file path.
-     */
-    public function getTemplatePath(string $identifier = 'default'): string
-    {
-        $viewDirectory = ConfigProvider::getInstance()->get('directories')['view'];
-
-        // Assuming templates are stored in 'app.php/view/' directory
-        $baseDir = __DIR__ . '/../../../../../view/';
-        $path = str_replace('/', DIRECTORY_SEPARATOR, $identifier);
-        return $viewDirectory . 'layout/adminhtml/' . $identifier . '.html';
     }
 }
