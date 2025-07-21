@@ -1,8 +1,21 @@
-<h1>This is the sidebar</h1>
-<!--index.index.sidebar.menu.items-->
-<!--index.index.sidebar.menu.heading-->
-
 <?php
 /** @var \Framework\View\Block\Element $block */
 var_export($block->getChildren());
+$children = $block->getChildren();
 ?>
+
+<h1>Parent Block Start</h1>
+<h2>Manual Child Processing</h2>
+<?php foreach ($children as $child): ?>
+    <div class="sidebar-item">
+        <?php echo $child->_toHtml(); ?>
+    </div>
+<?php endforeach; ?>
+<h2>Child Processing via placeholders</h2>
+<!--index.index.sidebar.menu.heading-->
+<!--index.index.sidebar.menu.items-->
+<h2>Child Processing via dynamic naming fetching technique</h2>
+<?php foreach ($children as $child): ?>
+    <!--<?= $child->getName() ?>-->
+<?php endforeach; ?>
+<h1>Parent Block End</h1>
