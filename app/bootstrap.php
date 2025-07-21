@@ -13,15 +13,12 @@ $container->bind('config', function () {
     return file_exists($configPath) ? require $configPath : [];
 });
 
-// Register service providers
-//$container->registerProvider(LogServiceProvider::class);
-//$container->registerProvider(FileSystemServiceProvider::class);
-//$container->registerProvider(SchemaServiceProvider::class);
-//$container->registerProvider(ViewServiceProvider::class);
-//$container->registerProvider(AppAbstractServiceProvider::class);
+$frameworkServiceProvidersDirectory = __DIR__ . '/../framework/Services';
+$userDefinedProvidersDirectory = __DIR__ . '/code/Services';
 
-$serviceProviderDirectory = __DIR__ . '/code/Services';
+$container->findAndLoadServiceProviders($frameworkServiceProvidersDirectory, 'Framework\Services');
+$container->findAndLoadServiceProviders($userDefinedProvidersDirectory, 'App\Services');
 
-$container->findAndLoadServiceProviders($serviceProviderDirectory);
+$container->bootContainer();
 
 return $container;
