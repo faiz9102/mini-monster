@@ -4,6 +4,7 @@
 
 !app/
 !app/**
+app/config/env.php
 
 !framework/
 !framework/**
@@ -16,3 +17,9 @@
 
 !composer.json
 !composer.lock
+
+!var
+!var/*
+
+!bin
+!bin/app.php
