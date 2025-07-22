@@ -1,6 +1,6 @@
 <?php
 
-namespace Framework\App;
+namespace Framework\Request;
 
 class RequestContext
 {
