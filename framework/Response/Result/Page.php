@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Framework\Response\Result;
 
-use Framework\App\RequestContext;
+use Framework\App\Area\Interfaces\AreaManagerInterface;
 use Framework\ConfigProvider;
 use Framework\Response\AbstractResponse;
 use Framework\View\Layout\Interfaces\LayoutInterface;
@@ -15,14 +15,14 @@ class Page extends AbstractResponse
     private LayoutInterface $layout;
     private PageProcessorInterface $pageProcessor;
 
-    private RequestContext $requestContext;
+    private AreaManagerInterface $requestContext;
 
     private ConfigProvider $config;
 
     public function __construct(
         LayoutInterface        $layout,
         PageProcessorInterface $pageProcessor,
-        RequestContext         $requestContext,
+        AreaManagerInterface   $areaManager,
         ConfigProvider         $config,
         int                    $statusCode = 200,
         array                  $headers = [],
@@ -32,7 +32,7 @@ class Page extends AbstractResponse
         $this->pageProcessor = $pageProcessor;
         $this->layout = $layout;
         $this->contentType = self::CONTENT_TYPE;
-        $this->requestContext = $requestContext;
+        $this->requestContext = $areaManager;
         parent::__construct($statusCode, $headers, self::CONTENT_TYPE);
     }
 
@@ -90,7 +90,7 @@ class Page extends AbstractResponse
         $uri = parse_url($uri, PHP_URL_PATH);
 
         // Normalize the URI by trimming admin path
-        if(!empty($adminIdentifier) && str_starts_with($uri, '/' . $adminIdentifier)) {
+        if (!empty($adminIdentifier) && str_starts_with($uri, '/' . $adminIdentifier)) {
             $uri = substr($uri, strlen('/' . $adminIdentifier));
         }
 
@@ -100,8 +100,8 @@ class Page extends AbstractResponse
         $requestParts = explode('/', $uri);
 
         // Ensure at least controller + action
-        if(count($requestParts) < 2) {
-            if($requestParts[0] === '')
+        if (count($requestParts) < 2) {
+            if ($requestParts[0] === '')
                 $requestParts[0] = 'index';
             $requestParts = array_pad($requestParts, 2, 'index');
         }

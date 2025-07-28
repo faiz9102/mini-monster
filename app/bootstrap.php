@@ -3,8 +3,6 @@ declare(strict_types=1);
 
 use Framework\DI\Container;
 
-$initParams = $_SERVER;
-
 $container = Container::getInstance();
 
 // Base config binding

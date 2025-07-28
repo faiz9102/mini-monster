@@ -2,26 +2,41 @@
 
 namespace Framework\Request;
 
-class RequestContext
+use Framework\DI\DataInjectable;
+use Framework\Request\Interfaces\ContextInterface;
+use Framework\Request\Interfaces\GetInterface;
+use Framework\Request\Interfaces\PostInterface;
+use Framework\Request\Interfaces\ServerInterface;
+
+class Context implements ContextInterface
 {
-    private bool $isAdmin;
+    use DataInjectable;
+    private GetInterface $get;
+    private PostInterface $post;
+    private ServerInterface $server;
 
-    public function __construct(bool $isAdmin = false)
-    {
-        $this->isAdmin = $isAdmin;
+    public function __construct(
+        GetInterface $get,
+        PostInterface $post,
+        ServerInterface $server
+    ) {
+        $this->get = $get;
+        $this->post = $post;
+        $this->server = $server;
     }
 
-    /**
-     * Check if the request is for an admin URL.
-     *
-     * @return bool
-     */
-    public function isAdmin(): bool {
-        return $this->isAdmin;
+    public function get(): GetInterface
+    {
+        return $this->get;
     }
 
-    public function setIsAdmin(bool $isAdmin): void
+    public function post(): PostInterface
     {
-        $this->isAdmin = $isAdmin;
+        return $this->post;
+    }
+
+    public function server(): ServerInterface
+    {
+        return $this->server;
     }
 }

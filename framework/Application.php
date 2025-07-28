@@ -4,9 +4,9 @@ namespace Framework;
 
 use Framework\App\Bootstrap;
 use Framework\App\Interfaces\AppInterface;
-use Framework\App\RequestContext;
 use Framework\DI\Container;
 use Framework\Logger\Interfaces\LoggerInterface;
+use Framework\App\Area\Interfaces\AreaManagerInterface;
 use Framework\Response\Interfaces\ResponseInterface;
 use Framework\Response\Result\Page;
 
@@ -43,26 +43,26 @@ class Application implements AppInterface
     public function launch(): ResponseInterface
     {
         // Get the request context from container
-        /** @var RequestContext $requestContext */
-        $requestContext = $this->container->get(RequestContext::class);
+        /** @var AreaManagerInterface $areaManager */
+        $areaManager = $this->container->get(AreaManagerInterface::class);
 
         // Parse URL and determine if we're in admin mode
         $path = trim(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/');
         $pathParts = array_values(array_filter(explode('/', $path)));
 
-        // Check if we're in admin area
-        $this->checkAndSetAdminArea($requestContext, $pathParts);
+        // Check if we're in admin areaManager
+        $this->checkAndSetAdminArea($areaManager, $pathParts);
 
         // Resolve controller and action names
         $controllerName = $pathParts[0] ?? 'index';
         $actionName = $pathParts[1] ?? 'index';
 
         // Build the controller class name
-        $controllerClass = $this->buildControllerClassName($requestContext, $controllerName, $actionName);
+        $controllerClass = $this->buildControllerClassName($areaManager, $controllerName, $actionName);
         $actionMethod = 'execute';
 
         // Log route information
-        $this->logRouteInformation($controllerClass, $actionMethod, $path, $requestContext->isAdmin());
+        $this->logRouteInformation($controllerClass, $actionMethod, $path, $areaManager->isAdmin());
 
         // Try to dispatch to the controller
         return $this->dispatchController($controllerClass, $actionMethod, $controllerName, $actionName);
@@ -71,21 +71,20 @@ class Application implements AppInterface
     /**
      * Check if request is for admin area and update request context
      */
-    private function checkAndSetAdminArea(RequestContext $requestContext, array &$pathParts): void
+    private function checkAndSetAdminArea(AreaManagerInterface $requestContext, array &$pathParts): void
     {
         $backend = $this->config->get('backend', []);
         $frontName = is_array($backend) ? ($backend['frontName'] ?? '') : '';
 
         if (!empty($pathParts[0]) && $pathParts[0] === $frontName) {
-            array_shift($pathParts);    // remove admin front name from path parts
-            $requestContext->setIsAdmin(true);
+            array_shift($pathParts);
         }
     }
 
     /**
      * Build controller class name based on request parts
      */
-    private function buildControllerClassName(RequestContext $requestContext, string $controllerName, string $actionName): string
+    private function buildControllerClassName(AreaManagerInterface $requestContext, string $controllerName, string $actionName): string
     {
         return 'App\\Controllers\\' .
             ($requestContext->isAdmin() ? 'Adminhtml\\' : '') .

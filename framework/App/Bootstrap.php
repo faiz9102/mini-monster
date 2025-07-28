@@ -8,6 +8,7 @@ use Framework\App\Interfaces\AppInterface;
 use Framework\DI\Container;
 use JetBrains\PhpStorm\NoReturn;
 use Framework\Logger\Interfaces\LoggerInterface;
+use Framework\Request\Interfaces\ContextInterface as Context;
 
 /**
  * A bootstrap of application
@@ -21,9 +22,9 @@ class Bootstrap
     /**
      * The initialization parameters (normally come from the $_SERVER)
      *
-     * @var array
+     * @var Context
      */
-    private array $server;
+    private Context $context;
 
     /**
      * Root directory
@@ -57,7 +58,6 @@ class Bootstrap
     {
         $this->handleGlobalException();
         $this->rootDir = $rootDir;
-        $this->server = [...$initParams];
 
         if ($container === null) {
             // Load the bootstrap file to get a properly configured container
@@ -71,6 +71,8 @@ class Bootstrap
         } else {
             $this->container = $container;
         }
+
+        $this->context = $this->container->get(Context::class, $initParams);
     }
 
     /**
@@ -80,7 +82,7 @@ class Bootstrap
      */
     public function getParams()
     {
-        return $this->server;
+        return $this->context;
     }
 
     /**

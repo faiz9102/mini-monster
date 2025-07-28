@@ -24,10 +24,9 @@ use Framework\Application;
  */
 
 $rootDir = BP;
-$initParams = $_SERVER;
 
 // Create Bootstrap instance
-$bootstrap = new Bootstrap($rootDir, $initParams);
+$bootstrap = new Bootstrap($rootDir);
 
 // Create Application instance through Bootstrap
 $application = $bootstrap->createApplication(Application::class);

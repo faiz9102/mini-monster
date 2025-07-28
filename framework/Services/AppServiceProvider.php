@@ -8,11 +8,18 @@ use Framework\DI\AbstractServiceProvider;
 use Framework\Logger\Interfaces\LoggerInterface;
 use Framework\Response\Interfaces\ResponseInterface;
 use Framework\Response\Result\Page;
+use Framework\App\Area\Interfaces\AreaManagerInterface;
+use Framework\App\Area\AreaManager;
 
 class AppServiceProvider extends AbstractServiceProvider
 {
     public function register(): void
     {
+        $this->container->bindInterface(
+            AreaManagerInterface::class,
+            AreaManager::class
+        );
+
         $this-> container->bindInterface(
             ResponseInterface::class,
             Page::class
@@ -41,7 +48,6 @@ class AppServiceProvider extends AbstractServiceProvider
 
     public function boot(): void
     {
-        // Initializing the RequestContext class so its shared instance is available ASAP
-        $this->container->get(\Framework\App\RequestContext::class);
+
     }
 }

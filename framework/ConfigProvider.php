@@ -25,9 +25,6 @@ class ConfigProvider
 
     public function get(string $key, mixed $default = null): mixed
     {
-        if (self::$instance === null) {
-            self::$instance = new self();
-        }
         return $this->config[$key] ?? $default;
     }
 }
