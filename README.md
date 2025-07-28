@@ -52,7 +52,7 @@ view/               # Layouts and templates
    - Point your document root to `public/`
    
 5. **Configure environment:**
-   - Copy `config/env.php.example` to `config/env.php` and adjust settings as needed.
+   - Copy `config/env.php.sample` to `config/env.php` and adjust settings as needed.
 
 ## Usage
 
