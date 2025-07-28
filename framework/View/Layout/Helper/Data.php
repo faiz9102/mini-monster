@@ -1,12 +1,15 @@
 <?php
 
 namespace Framework\View\Layout\Helper;
+
 use Framework\FileSystem\ViewFileSystem;
 use Framework\Utils\Json\Serializer;
 use JetBrains\PhpStorm\ArrayShape;
 
 class Data
 {
+    const string LAYOUT_FILE_EXTENSION = '.json';
+
     /**
      * Parse the JSON layout file and return the layout config as Associative array
      *
@@ -26,8 +29,7 @@ class Data
 
         try {
             $layoutConfig = Serializer::decode($content);
-        }
-        catch (\RuntimeException $e) {
+        } catch (\RuntimeException $e) {
             throw new \RuntimeException("Failed to parse layout file: $layoutFile. Error: " . $e->getMessage());
         }
 
@@ -42,15 +44,32 @@ class Data
      *
      * @param string $layoutName
      * @return string
+     * @throws \RuntimeException
      */
-    public static function getLayoutFile(string $layoutName): string
+    public static function getLayoutFile(string $layoutName, bool $isAdmin, bool $includeBaseArea = true): string
     {
         $layoutInfo = self::getLayoutInfo($layoutName);
-        $viewPath = ViewFileSystem::getViewPath();
+        $layoutPath = ViewFileSystem::getLayoutPath();
 
-        return $viewPath . DIRECTORY_SEPARATOR . 'layout' . DIRECTORY_SEPARATOR
-            . $layoutInfo['area'] . DIRECTORY_SEPARATOR
-            . $layoutInfo['filePath'] . '.json';
+        if ($isAdmin) {
+            $areaDir[] = ViewFileSystem::ADMIN_DIRECTORY ;
+        } else {
+            $areaDir[] = ViewFileSystem::FRONTEND_DIRECTORY;
+        }
+
+        if ($includeBaseArea) {
+            $areaDir[] = ViewFileSystem::BASE_DIRECTORY;
+        }
+
+        foreach ($areaDir as $area) {
+            $layoutFile = $layoutPath . DIRECTORY_SEPARATOR . $area . DIRECTORY_SEPARATOR
+                . $layoutInfo['filePath'] . self::LAYOUT_FILE_EXTENSION;
+
+            if (file_exists($layoutFile)) {
+                return $layoutFile;
+            }
+        }
+        throw new \RuntimeException("Layout file not found: " . $layoutFile);
     }
 
     /**

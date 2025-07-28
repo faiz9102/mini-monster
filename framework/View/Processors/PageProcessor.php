@@ -2,12 +2,13 @@
 
 namespace Framework\View\Processors;
 
-use Framework\App\RequestContext;
+use Framework\Request\Context;
 use Framework\Schema\SchemaFacade;
-use Framework\View\Layout\Interfaces\LayoutInterface;
 use Framework\View\Layout\Helper\Data as LayoutHelper;
+use Framework\View\Layout\Interfaces\LayoutInterface;
 use Framework\View\Processors\Interfaces\LayoutProcessorInterface;
 use Framework\View\Processors\Interfaces\PageProcessorInterface;
+use Framework\App\Area\Interfaces\AreaManagerInterface;
 
 class PageProcessor implements PageProcessorInterface
 {
@@ -17,27 +18,29 @@ class PageProcessor implements PageProcessorInterface
 
     private SchemaFacade $schemaFacade;
 
-    private RequestContext $requestContext;
+    private Context $requestContext;
+
+    private AreaManagerInterface $areaManager;
 
     public function __construct(
         LayoutProcessorInterface $layoutProcessor,
         SchemaFacade             $schemaFacade,
-        RequestContext           $requestContext
+        AreaManagerInterface      $areaManager,
+        Context $requestContext
     )
     {
         $this->requestContext = $requestContext;
         $this->layoutProcessor = $layoutProcessor;
+        $this->areaManager = $areaManager;
         $this->schemaFacade = $schemaFacade;
     }
 
     public function process(LayoutInterface $layout): string
     {
         // Get the layout file based on the layout identifier
-        $layoutFile = LayoutHelper::getLayoutFile($layout->getName());
+        $layoutFile = LayoutHelper::getLayoutFile($layout->getName(),$this->areaManager->isAdmin(),false);
 
-        if (!file_exists($layoutFile)) {
-            throw new \RuntimeException("Layout file not found: " . $layoutFile);
-        }
+
 
         $fileData = LayoutHelper::parse($layoutFile);
 
