@@ -15,6 +15,9 @@ app/config/env.php
 !view/
 !view/**
 
+!phpserver
+!phpserver/router.php
+
 !composer.json
 !composer.lock
 

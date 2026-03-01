@@ -7,6 +7,7 @@ use Framework\App\Interfaces\AppInterface;
 use Framework\DI\Container;
 use Framework\Logger\Interfaces\LoggerInterface;
 use Framework\App\Area\Interfaces\AreaManagerInterface;
+use Framework\Request\Interfaces\ContextInterface;
 use Framework\Response\Interfaces\ResponseInterface;
 use Framework\Response\Result\Page;
 
@@ -43,11 +44,14 @@ class Application implements AppInterface
     public function launch(): ResponseInterface
     {
         // Get the request context from container
+        /** @var ContextInterface $context */
+        $context = $this->container->get(ContextInterface::class);
+
         /** @var AreaManagerInterface $areaManager */
         $areaManager = $this->container->get(AreaManagerInterface::class);
 
         // Parse URL and determine if we're in admin mode
-        $path = trim(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/');
+        $path = trim(parse_url($context->server()->getRequestUri(), PHP_URL_PATH), '/');
         $pathParts = array_values(array_filter(explode('/', $path)));
 
         // Check if we're in admin areaManager
