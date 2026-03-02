@@ -124,19 +124,17 @@ class Bootstrap
     public function run(AppInterface $application)
     {
         try {
-            try {
-                $this->initErrorHandler();
-                $this->assertMaintenance();
-                if (!$this->assertInstalled())
-                    throw new \Exception('Application is not installed. Please install it first before using.');
+            $this->initErrorHandler();
+            $this->assertMaintenance();
+            if (!$this->assertInstalled())
+                throw new \Exception('Application is not installed. Please install it first before using.');
 
-                $response = $application->launch();
-                $response->send();
-            } catch (\Exception $e) {
-                $this->container->get(LoggerInterface::class)->error($e->getMessage());
-                if (!$application->catchException($this, $e)) {
-                    throw $e;
-                }
+            $response = $application->launch();
+            $response->send();
+        } catch (\Exception $e) {
+            $this->container->get(LoggerInterface::class)->error($e->getMessage());
+            if (!$application->catchException($this, $e)) {
+                throw $e;
             }
         } catch (\Throwable $e) {
             $this->terminate($e);

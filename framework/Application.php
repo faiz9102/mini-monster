@@ -66,7 +66,9 @@ class Application implements AppInterface
         $actionMethod = 'execute';
 
         // Log route information
-        $this->logRouteInformation($controllerClass, $actionMethod, $path, $areaManager->isAdmin());
+        if($this->config->get("mode") !== "development") {
+            $this->logRouteInformation($controllerClass, $actionMethod, $path, $areaManager->isAdmin());
+        }
 
         // Try to dispatch to the controller
         return $this->dispatchController($controllerClass, $actionMethod, $controllerName, $actionName);
